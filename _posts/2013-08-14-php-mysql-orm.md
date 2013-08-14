@@ -1,7 +1,7 @@
 ---
 layout: post
 title: 基于php、mysql实现的对象关系映射
-category: [设计]
+category: 设计
 tags: [php, mysql]
 ---
 
