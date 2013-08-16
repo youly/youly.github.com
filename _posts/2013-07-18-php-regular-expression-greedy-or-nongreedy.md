@@ -1,9 +1,11 @@
 ---
 layout: post
-title: php正则表达式 贪婪匹配与非贪婪匹配
+title: php正则表达式-非贪婪匹配和递归匹配
 tag: [php, 正则]
 category: php
 ---
+
+###贪婪匹配与非贪婪匹配
 
 php中所有的正则表达式默认都是贪婪的，即一个标识符（如\*）会尽可能多地匹配字符。
 
@@ -87,5 +89,39 @@ php中所有的正则表达式默认都是贪婪的，即一个标识符（如\*
 >感觉贪婪、非贪婪匹配纠结的地方是 需要在整个正则表达式成功匹配的前提下 使子模式尽可能多（少）的匹配，否则需要回溯，直到匹配成功
 
 
+###递归匹配
+
+递归匹配用符号(?R)来表示，指正则表达式本身。php文档里的[描述](http://php.net/manual/en/regexp.reference.recursive.php):
+
+>Consider the problem of matching a string in parentheses, allowing for unlimited nested parentheses. Without the use of recursion, the best that can be done is to use a pattern that matches up to some fixed depth of nesting.
+
+看下面的代码：
+
+	$str = '{"name":"percent_param", "default":{"24小时回复率":["24小时回复量","售后平台维权量"]}}';
+	preg_match_all("/{[^{}]*((?R)*)}/", $str, $t);
+	var_dump($t);
+
+打印结果：
+
+	array(2) {
+	  [0]=>
+	  array(1) {
+	    [0]=>
+	    string(103) "{"name":"percent_param", "default":{"24小时回复率":["24小时回复量","售后平台维权量"]}}"
+	  }
+	  [1]=>
+	  array(1) {
+	    [0]=>
+	    string(67) "{"24小时回复率":["24小时回复量","售后平台维权量"]}"
+	  }
+	}
+
+这里要理解为什么$t\[1\] = {"24小时回复率":["24小时回复量","售后平台维权量"]}。如果把正则表达式改成"/{\[^{}\]*(?R*)}/"呢？结果就很明显了，$t\[1\]是正则表达式匹配迭代中最后一次的捕获结果。
+
+><span style="color:red">PREG_PATTERN_ORDER:Orders results so that $matches[0] is an array of full pattern matches, $matches[1] is an array of strings matched by the first parenthesized subpattern, and so on.If no order flag is given, PREG_PATTERN_ORDER is assumed.</span>
+
+
 ###参考链接
 1、[Choosing Greedy or Nongreedy Matches](http://docstore.mik.ua/orelly/webprog/pcook/ch13_05.htm)
+
+2、[PHP中的递归正则](http://iregex.org/blog/recursive-regex-in-php.html)
