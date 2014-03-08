@@ -76,7 +76,6 @@ MVC是软件工程中的一种架构模式，成功地使用这种模式能够�
 
 上面的重写规则指定除了public目录之外所有的请求都重定向到public目录下的index.php文件。可[点此](http://www.yourhtmlsource.com/sitemanagement/urlrewriting.html)了解apache的重写规则。打开index.php文件，我们可以看到如下的两行代码：
 
-	<?php
 	Dispatcher::getInstance()->dispatch();
 
 这个文件很简短，只有两行。注意它并没有以?>结尾，主要是为了避免在我们的输出中注入多余的空格。那么Dispatcher是什么？它来自哪里？
@@ -84,7 +83,6 @@ MVC是软件工程中的一种架构模式，成功地使用这种模式能够�
 ####php配置
 ROOT为网站根目录。打开php.ini并设置auto_prepend_file=ROOT/config/prepend.php，这样每次执行用户请求的php文件前php内核将先执行prepend.php。打开prepend.php文件，我们可以看到：
 
-	<?php
 	define('DEVELOPMENT_ENVIRONMENT', true);
 	define('DS', DIRECTORY_SEPARATOR);
 	define('ROOT', '/Users/meituan-it/dev/php-mvc');
@@ -139,7 +137,6 @@ ROOT为网站根目录。打开php.ini并设置auto_prepend_file=ROOT/config/pre
 
 我们的第一个类Dispatcher，负责分发从前端传来的请求。打开lib/Dispatcher.php文件：
 
-	<?php
 	class Dispatcher
 	{
 	    protected static $front;
@@ -199,7 +196,6 @@ ROOT为网站根目录。打开php.ini并设置auto_prepend_file=ROOT/config/pre
 
 打来文件lib/BaseController.php:
 
-	<?php
 	class BaseController {
 	     
 	    protected $_model;
@@ -233,7 +229,6 @@ Controller负责从Mode里取数据，并通过视图呈现出来。
 
 ####View
 
-	<?php
 	class View {
 	     
 	    protected $variables = array();
@@ -271,7 +266,6 @@ Controller负责从Mode里取数据，并通过视图呈现出来。
 
 Model，数据模型，负责存取数据。一般的Web框架中都会有对象关系映射（ORM)，即一个Model类属性对应数据库记录的一列。为了简单起见，先不考虑这个。
 	
-	<?php
 	class BaseModel extends SQLQuery
 	{
 	    protected $_table;
@@ -288,7 +282,6 @@ Model，数据模型，负责存取数据。一般的Web框架中都会有对象
 
 这个类继承自SQLQuery，它封装了数据库连接的逻辑：
 
-	<?php
 
 	class SQLQuery {
 	    protected $_db;
@@ -364,7 +357,6 @@ Model，数据模型，负责存取数据。一般的Web框架中都会有对象
 ####实例
 有了上面的mvc，就可以开始做简单的开发了：
 	
-	<?php
 	class IndexController extends BaseController
 	{
 		public function actDefault($defaultArg = null)
@@ -376,23 +368,19 @@ Model，数据模型，负责存取数据。一般的Web框架中都会有对象
 		}
 	}
 
-	<?php
 	echo is_null($defaultArg) ? 'hello world' : 'hello ' . $defaultArg;
-	?>
-	<h3>留言板</h3>
+	
+    echo '<h3>留言板</h3>
 	<table border=0>
-	<?php
-	echo '<tr><th>内容</th><th>时间</th>';
+	<tr><th>内容</th><th>时间</th>';
 	foreach($messages as $msg)
 	{
 		echo '<tr>';
 		echo '<td>', $msg['msg'], '</td><td>', date('Y-m-d H:i:s', $msg['addtime']), '</td>';
 		echo '</tr>';
 	}
-	?>
-	</table>
+	echo '</table>';
 
-	<?php
 	class MessageModel extends BaseModel
 	{
 		
