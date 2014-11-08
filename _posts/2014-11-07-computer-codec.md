@@ -2,7 +2,7 @@
 layout: post
 title: 计算机编码
 category: 原来如此
-tags: [编码 python]
+tags: [编码, python]
 ---
 
 ###什么是编码
