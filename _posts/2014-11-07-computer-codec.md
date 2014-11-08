@@ -14,7 +14,7 @@ java后端采用utf8编码，mysql也采用utf8编码，都正常，怎么会报
 
 先来看看 \'\xF0\x9F\x8E\x81\xE7\x9A...\'是什么：
 
-使用python，将字节还原成utf8编码，然后再打印出来：
+使用python，将字节还原成unicode编码，然后再打印出来：
 
 ![unicode](/assets/images/unicode.png)
 
@@ -29,7 +29,7 @@ java后端采用utf8编码，mysql也采用utf8编码，都正常，怎么会报
                 return input.replaceAll("[^\\u0000-\\uFFFF]", "");
     }
 
-或者适用java内置的方法：
+或者使用java内置的方法：
 
     public static boolean isEntirelyInBasicMultilingualPlane(String text) {
         for (int i = 0; i < text.length(); i++) {
@@ -57,7 +57,7 @@ java后端采用utf8编码，mysql也采用utf8编码，都正常，怎么会报
 ###Unicode与UTF-8、UTF-16
 Unicode， 统一（唯一）编码，能表示所有字符的字符集，不仅仅局限于某国语言。
 
-Unicode仅仅是一个概念，不能被电脑表示、不能用来传输，于是就有了UTF(Unicode Transfer Format)，将unicode转换成1到6个字节。
+Unicode仅仅是一个概念，不能被电脑表示、不能用来传输，于是就有了UTF(Unicode Transfer Format)，将unicode安装某种规则转换成1到6个字节。
 
 ###源文件编码
 源文件编码(source code encode)， 由操作系统默认编码和编辑器决定。编写完代码点击保存时，编辑器会以特定的编码（通常是操作系统默认编码）来保存文件。
