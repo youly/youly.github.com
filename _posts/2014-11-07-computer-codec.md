@@ -5,6 +5,41 @@ category: 原来如此
 tags: [编码, python]
 ---
 
+###遇到的情况
+用户给商品添加评价，结果报错：
+
+    uncategorized SQLException for SQL []; SQL state [HY000]; error code [1366]; Incorrect string value: '\xF0\x9F\x8E\x81\xE7\x9A...'
+
+java后端采用utf8编码，mysql也采用utf8编码，都正常，怎么会报错呢？
+
+先来看看 \'\xF0\x9F\x8E\x81\xE7\x9A...\'是什么：
+
+使用python，将字节还原成utf8编码，然后再打印出来：
+
+![unicode](/assets/images/unicode.png)
+
+去[这里](http://www.utf8-chartable.de/unicode-utf8-table.pl)查询知道，\U0001f381 代表 WRAPPED PRESENT，以utf8编码后16进制为：f0 9f 8e 81， 长度为四个字节，再去mysql官网[查询](http://dev.mysql.com/doc/refman/5.5/en/charset-unicode-utf8.html), mysql的utf8编码实际仅仅支持最多3个字节的编码！
+
+如何解决这个问题呢？可以设置Mysql服务器编码为utf8mb4，也可以在业务层过滤掉超过四个字节的编码。
+
+把unicode范围\u0000-\uFFFF内的字符替换掉，来自stackoversflow的[代码](http://stackoverflow.com/questions/14981109/checking-utf-8-data-type-3-byte-or-4-byte-unicode)：
+
+    public static String withNonBmpStripped( String input ) {
+            if( input == null ) throw new IllegalArgumentException("input");
+                return input.replaceAll("[^\\u0000-\\uFFFF]", "");
+    }
+
+或者适用java内置的方法：
+
+    public static boolean isEntirelyInBasicMultilingualPlane(String text) {
+        for (int i = 0; i < text.length(); i++) {
+            if (Character.isSurrogate(text.charAt(i))) {
+                return false;
+            }
+        }
+        return true;
+    }
+
 ###什么是编码
 
 信息是什么？对计算机来说，是一系列的0、1串，而对于人来说，则是一系列可以理解的数字、符号、表情等。
@@ -30,8 +65,14 @@ Unicode仅仅是一个概念，不能被电脑表示、不能用来传输，于�
 有的编辑器会在源文件开头增加编码标识，以便读取时以此种编码标识解码。
 
 ###运行时编码
-程序运行时采用的一种编码，通常与源文件编码不同。如python运行时以unicode来表示所有的字符。
+程序运行时采用的一种编码，相对程序来说，通常与源文件编码不同。如python运行时以unicode来表示所有的字符。
 
 ###参考
 1、[All About Python and Unicode](http://pythonic.zoomquiet.io/data/20110415091609/index.html)
+
+2、[Unicode-utf8字符表](http://www.utf8-chartable.de/unicode-utf8-table.pl)
+
+3、[Wikipedia:Plane_Unicode](http://en.wikipedia.org/wiki/Plane_(Unicode))
+
+4、[Mysql The utf8 Character Set (3-Byte UTF-8 Unicode Encoding)](http://dev.mysql.com/doc/refman/5.5/en/charset-unicode-utf8.html)
 
