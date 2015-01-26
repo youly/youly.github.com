@@ -173,9 +173,7 @@ accept方法代码如下（文件org.eclipse.jetty.server.ServerConnector）：
         _manager.accept(channel);
     }
 
-_manager成员变量在ServerConnector构造函数里被初始化，调用ServerConnector的doStart方法时，_manager（org.eclipse.jetty.io.SelectorManager）的doStart方法也将被调用。
-
-SelectorManager管理多个Selector（org.eclipse.jetty.io.ManagedSelector），每次从channel里accept到一个连接时，_manager从selector数组中选取一个ManagedSelector，由此ManagedSelector负责此连接后续数据的读写。
+3）连接交由Selector管理。上面的成员变量_manager在ServerConnector构造时被初始化。SelectorManager管理多个Selector（org.eclipse.jetty.io.                                                                                                                                               ManagedSelector），每次从channel里accept到一个连接时，_manager从selector数组中选取一个ManagedSelector，由此ManagedSelector负责此连接后续数据的读写。
 
 文件org.eclipse.jetty.io.SelectorManager，选择selector：
 
@@ -184,6 +182,27 @@ SelectorManager管理多个Selector（org.eclipse.jetty.io.ManagedSelector），
         final ManagedSelector selector = chooseSelector(null);
         selector.submit(selector.new Acceptor(server));
     }
+
+ServerConnector的doStart方法执行时，_manager（org.eclipse.jetty.io.SelectorManager）的doStart方法也将被执行：如下（文件org.eclipse.jetty.io.ManagedSelector）：
+
+    @Override
+    protected void doStart() throws Exception
+    {
+        super.doStart();
+        for (int i = 0; i < _selectors.length; i++)
+        {
+            ManagedSelector selector = newSelector(i);
+            _selectors[i] = selector;
+            selector.start();
+            execute(selector);
+        }
+    }
+
+4）ManagedSelector类。ManagedSelector的run方法，其主要工作阻塞等待监听的channel数据读写ready及接受新的channel数据监听请求。
+
+如果selector已经处于select状态下，需要先调用selector的wakeup方法，然后才能往selector新注册channel。
+
+
 
 ###参考
 1、[Jetty Architecture](http://www.eclipse.org/jetty/documentation/current/architecture.html#basic-architecture)
