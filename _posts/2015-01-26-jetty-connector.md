@@ -1,8 +1,8 @@
 ---
 layout: post
 title: Jetty源码阅读 - connector
-category: jetty,源码
-tags: [jetty]
+category: 源码
+tags: [jetty, java, nio]
 ---
 
 ###Jetty是什么
