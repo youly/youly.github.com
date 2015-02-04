@@ -21,7 +21,7 @@ tags: [lock,synchronized]
 
 >The Java virtual machine (JVM) supports this mechanism via monitors and the associated monitorenter and monitorexit instructions.
 
-* 保证共享变量的互斥性：同一时刻只能有一个线程对共享变量的读写。monitor lock实现，monitor提供了一种互斥访问的机制，保证只有一个进程进入临界区。
+* 保证共享变量的互斥性：同一时刻只能有一个线程对共享变量的修改（注意修改一次，是先读再写，是两个操作）。monitor lock实现，monitor提供了一种互斥访问的机制，保证只有一个进程进入临界区。
 
 ###synchronized与lock的区别
 
