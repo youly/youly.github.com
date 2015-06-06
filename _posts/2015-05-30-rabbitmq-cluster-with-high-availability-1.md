@@ -1,6 +1,6 @@
 ---
 layout: post
-title: 使用rabbitmq提供高可用性队列服务
+title: 使用rabbitmq提供高可用性队列服务(1)
 category: 分布式
 tags: [queue,rabbitme,ha]
 ---
@@ -64,6 +64,10 @@ rabbitmq提供的高可用集群参考了这一理论，提供一致性的数据
 4、重启一个salve节点，其持久保存的数据将被丢弃。
 
 5、需要移除master节点或者选择一个新的master时，要执行 rabbitmqctl forget_cluster_node，然后才启动salves。
+
+###rabbitmq集群搭建
+
+请参考[下一篇文章](/2015/06/06/rabbitmq-cluster-with-high-availability-2)
 
 ###参考
 1、[Rabbitmq Clustering Guide](https://www.rabbitmq.com/clustering.html)
