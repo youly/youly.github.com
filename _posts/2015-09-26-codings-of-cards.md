@@ -12,45 +12,24 @@ tags: [php, 编码]
 我们常见的银行卡由16位纯数字组成，如中国红十字会捐款账户 6215582201003818703。那么这一串数字由哪些部分组成呢？
 
 1、IIN(Issuer identifier number)
+
 前面6位表示发行者身份标识，由国际卡组织分配，其中首位是4的是VISA的卡，5是Master, 622126~622925是银联标准卡。发行者不仅仅指银行，还包含其他一些商业机构。
 
 有时IIN也被指 bank identification number (bin)。这六位中的第一位又用来唯一标识卡发行者的主要行业。以下是行业对应的编码：
 
-<table class="table table-bordered table-striped table-condensed">
-	<tr>
-        <th>MII digit</th><th>value	Issuer category</td>
-    </tr>
-    <tr>
-        <td>0</td><td>ISO/TC 68 and other industry assignments</td>
-    </tr>
-    <tr>
-        <td>1</td><td>Airlines</td>
-    </tr>
-    <tr>
-        <td>2</td><td>Airlines, financial and other future industry assignments</td>
-    </tr>
-    <tr>
-        <td>3</td><td>Travel and entertainment</td>
-    </tr>
-    <tr>
-        <td>4</td><td>Banking and financial</td>
-    </tr>
-    <tr>    
-        <td>5</td><td>Merchandising and banking/financial</td>
-    </tr>
-    <tr>
-        <td>6</td><td>Merchandising and banking/financial</td>
-    </tr>
-	<tr>
-        <td>7</td><td>Petroleum and other future industry assignments</td>
-    </tr>
-    <tr>
-        <td>8</td><td>Healthcare, telecommunications and other future industry assignments</td>
-    </tr>
-    <tr>
-        <td>9</td><td>For assignment by national standards bodies</td>
-    </tr>
-</table>
+| MII digit | value	Issuer category  |
+| --------- | ---------------------- |
+| 0	        | ISO/TC 68 and other industry assignments |
+| 1	        | Airlines |
+| 2	        | Airlines, financial and other future industry assignments |
+| 3	        | Travel and entertainment |
+| 4	        | Banking and financial |
+| 5	        | Banking and financial |
+| 6	        | Merchandising and banking/financial |
+| 7	        | Petroleum and other future industry assignments |
+| 8	        | Healthcare, telecommunications and other future industry assignments |
+| 9	        | For assignment by national standards bodies |
+
 
 2、个人账户标识
 
@@ -75,6 +54,7 @@ tags: [php, 编码]
     6    4   1   10   5  16   2   4   0  2   0   0  3   16   1   16  7  0
 
 结果相加：
+
 6 + (4) + 1 + (1 + 0) + 5 + (1 + 6) + 2 + (4) + 0 + (2) + 0 + (0) + 3 + (1 + 6) + 1 + (1 + 6) + 7 + (0) = 57
 
 (57 + 3) % 10 == 0
@@ -118,6 +98,7 @@ php程序实现：
 中国公民第二代身份证由18位数字字符组成，分成四个部分：
 
 1、地址码
+
 表示编码对象常住户口所在县（市、旗、区）的行政区划代码，省市区都是两位
 
 省编码：
@@ -159,7 +140,9 @@ php程序实现：
 		82 => "澳门",
 		91 => "国外"
 	);
+
 2、出生日期码
+
 表示编码对象出生的年、月、日，年（YYYY)，月(mm), 日(dd)
 
 3、顺序码
@@ -214,6 +197,7 @@ php代码校验：
 
 
 ###参考
+
 1、[ISO/IEC_7812](https://en.wikipedia.org/wiki/ISO/IEC_7812)
 
 2、[银行卡编码规则](http://blog.sina.com.cn/s/blog_12fc3a84d0101u7o8.html)
