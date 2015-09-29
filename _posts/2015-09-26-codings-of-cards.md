@@ -65,7 +65,7 @@ php程序实现：
 
 	  public function bankcard_check($bankcard) {
         $bankcard = str_replace(' ', '', trim($bankcard));
-        if (!$bankcard || !preg_match('/^\d+$/', $bankcard) || strlen($bankcard) < 5) {
+        if (!$bankcard || !preg_match('/^\d{5,30}$/', $bankcard)) {
             return FALSE;
         }
         $checkcode = substr($bankcard, -1);
