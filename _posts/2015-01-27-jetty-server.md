@@ -7,7 +7,7 @@ tags: [jetty, java, nio]
 
 接着上篇[Jetty源码阅读 - connector](/2015/01/26/jetty-connector/)，本文将分析jetty组件中server组件的源码，基于jetty-9.3.0。
 
-###什么是Server
+### 什么是Server
 
 Jetty由若干个组件组成，Server则把这些组件关联起来，对外提供服务的接口，其在jetty整个架构中的位置如下：
 
@@ -15,7 +15,7 @@ Jetty由若干个组件组成，Server则把这些组件关联起来，对外提
 
 继承自HandlerWrapper，关联connector，server在这两者之间处于一种协调关系。
 
-###Server类图
+### Server类图
 
 ![jetty server](/assets/images/jetty_server.jpg)
 
@@ -23,7 +23,7 @@ Jetty由若干个组件组成，Server则把这些组件关联起来，对外提
 
 从上图可以看到，server和handler的关系与server和connector的关系不同， server类和handler类是继承关系，而不是关联关系。
 
-###Server源码分析
+### Server源码分析
 
 1）server类初始化，需要四个信息，监听ip，监听port，connector组件以及线程池。如下是其中的一个构造函数（文件org.eclipse.jetty.server.Server）：
 
@@ -77,7 +77,7 @@ Jetty由若干个组件组成，Server则把这些组件关联起来，对外提
         }
     }
 
-###参考
+### 参考
 
 1、[Jetty Architecture](http://www.eclipse.org/jetty/documentation/current/architecture.html#basic-architecture)
 

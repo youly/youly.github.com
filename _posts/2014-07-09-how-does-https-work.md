@@ -5,7 +5,7 @@ category: 协议
 tags: [protocol, https]
 ---
 
-###什么是https
+### 什么是https
 [https](http://en.wikipedia.org/wiki/HTTP_Secure)，简单的说就是HTTP协议+SSL协议。由于使用HTTP协议传输的数据没有加密，有可能被第三方窃取甚至修改，Netscape公司于1994年创造了https。SSL协议在通信过程中起了两个作用：
 
 1、确保通信双方身份没有伪造，通过数字证书实现。
@@ -14,7 +14,7 @@ tags: [protocol, https]
 
 了解https通信过程还需知道两种加密方式：非对称加密和对称加密。客户端与服务器进行安全数据交互之前，需在非对称秘钥的加密保护下生成用于会话期数据加密的对称秘钥。
 
-###SSL连接建立过程
+### SSL连接建立过程
 客户端和服务器交换数据之前有个握手协议，具体过程是：
 
 1、客户端初始化支持的加密算法、压缩算法、SSL协议版本，并向服务器发起消息结构体为client hello的连接
@@ -29,7 +29,7 @@ tags: [protocol, https]
 
 握手完成之后客户端和服务器可以安全交换信息了。
 
-###什么是数字证书
+### 什么是数字证书
 数字证书之于服务器，就像身份证之于人。数字证书由被公认的证书机构颁发。通常操作系统里都会内置一些知名证书机构的根证书。证书内容由以下几个部分组成（[来自wikipedia](http://en.wikipedia.org/wiki/Public_key_certificate)）：
 
 >Serial Number: Used to uniquely identify the certificate.
@@ -52,7 +52,7 @@ tags: [protocol, https]
 一般我们得到的证书都不是根证书机构直接颁发的，而是经过了中间机构。这里有一个信任链机制，客户端或从证书链的底端逐级网上找到根证书颁发机构，然后使用颁发机构的公钥逐级往下验证证书的有效性，过程如下图：
 ![证书链](/assets/images/digtal_certificate_sign1.gif)
 
-###参考
+### 参考
 1、[How does HTTPS actually work?](http://robertheaton.com/2014/03/27/how-does-https-actually-work/)
 
 2、[WikiPedia:HTTP_Secure](http://en.wikipedia.org/wiki/HTTP_Secure)

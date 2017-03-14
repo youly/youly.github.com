@@ -6,7 +6,7 @@ tag: [php]
 ---
 
 
-###什么是MVC
+### 什么是MVC
 ***
 [维基介绍](http://en.wikipedia.org/wiki/Model-view-controller)
 
@@ -133,7 +133,7 @@ ROOT为网站根目录。打开php.ini并设置auto_prepend_file=ROOT/config/pre
 
 这里重写了php原有的__autoload函数，使得它能自动加载我们自己定义的类。setReporting函数是为了方便我们调试。
 
-####第一个类
+#### 第一个类
 
 我们的第一个类Dispatcher，负责分发从前端传来的请求。打开lib/Dispatcher.php文件：
 
@@ -192,7 +192,7 @@ ROOT为网站根目录。打开php.ini并设置auto_prepend_file=ROOT/config/pre
 
 这个类的主要函数是dispatch，由它来负责分发请求。处理的url类似 **youly.com/controllerName/actionName/queryString**。关于这个正则表达式的分析看[这篇文章](/2013/07/18/php-regular-expression-greedy-or-nongreedy)。根据url中的控制器和动作，框架构造一个继承自BaseController的子类来处理具体的请求。
 
-####Controller
+#### Controller
 
 打来文件lib/BaseController.php:
 
@@ -227,7 +227,7 @@ ROOT为网站根目录。打开php.ini并设置auto_prepend_file=ROOT/config/pre
 
 Controller负责从Mode里取数据，并通过视图呈现出来。
 
-####View
+#### View
 
 	class View {
 	     
@@ -262,7 +262,7 @@ Controller负责从Mode里取数据，并通过视图呈现出来。
 
 这个文件主要负责展开模板变量并包含对应的模板文件。
 
-####Model
+#### Model
 
 Model，数据模型，负责存取数据。一般的Web框架中都会有对象关系映射（ORM)，即一个Model类属性对应数据库记录的一列。为了简单起见，先不考虑这个。
 	
@@ -354,7 +354,7 @@ Model，数据模型，负责存取数据。一般的Web框架中都会有对象
 	    }
 	}
 
-####实例
+#### 实例
 有了上面的mvc，就可以开始做简单的开发了：
 	
 	class IndexController extends BaseController
@@ -390,7 +390,7 @@ Model，数据模型，负责存取数据。一般的Web框架中都会有对象
 
 ![example](/assets/images/mvc-example.png)
 
-###参考
+### 参考
 ***
 1、<http://anantgarg.com/2009/03/13/write-your-own-php-mvc-framework-part-1/>
 

@@ -5,7 +5,7 @@ tag: [php, 正则]
 category: php
 ---
 
-###贪婪匹配与非贪婪匹配
+### 贪婪匹配与非贪婪匹配
 
 php中所有的正则表达式默认都是贪婪的，即一个标识符（如\*）会尽可能多地匹配字符。
 
@@ -89,7 +89,7 @@ php中所有的正则表达式默认都是贪婪的，即一个标识符（如\*
 >感觉贪婪、非贪婪匹配纠结的地方是 需要在整个正则表达式成功匹配的前提下 使子模式尽可能多（少）的匹配，否则需要回溯，直到匹配成功
 
 
-###递归匹配
+### 递归匹配
 
 递归匹配用符号(?R)来表示，指正则表达式本身。php文档里的[描述](http://php.net/manual/en/regexp.reference.recursive.php):
 
@@ -121,7 +121,7 @@ php中所有的正则表达式默认都是贪婪的，即一个标识符（如\*
 ><span style="color:red">PREG_PATTERN_ORDER:Orders results so that $matches[0] is an array of full pattern matches, $matches[1] is an array of strings matched by the first parenthesized subpattern, and so on.If no order flag is given, PREG_PATTERN_ORDER is assumed.</span>
 
 
-###参考链接
+### 参考链接
 1、[Choosing Greedy or Nongreedy Matches](http://docstore.mik.ua/orelly/webprog/pcook/ch13_05.htm)
 
 2、[PHP中的递归正则](http://iregex.org/blog/recursive-regex-in-php.html)

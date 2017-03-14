@@ -5,7 +5,7 @@ category: java
 tags: [lock,synchronized]
 ---
 
-###几个概念
+### 几个概念
 
 * 共享变量(shared variable)：多个线程都能访问的变量。
 
@@ -15,7 +15,7 @@ tags: [lock,synchronized]
 
 * 临界区(critical section)：访问共享资源的一段代码块。
 
-###synchronized解决的问题
+### synchronized解决的问题
 
 * 保证共享变量的可见性：变量缓存与编译器指令优化 会导致 变量修改的不可见性。
 
@@ -23,7 +23,7 @@ tags: [lock,synchronized]
 
 * 保证共享变量的互斥性：同一时刻只能有一个线程对共享变量的修改（注意修改一次，是先读再写，是两个操作）。monitor lock实现，monitor提供了一种互斥访问的机制，保证只有一个进程进入临界区。
 
-###synchronized与lock的区别
+### synchronized与lock的区别
 
 自jdk1.5后java.util.concurrent包提供了更广泛通用的锁实现lock，名字上的区别是，一个是隐式锁(intrinsic locking)，一个是显示锁(explicit lock)，从这点上来说，用户对显示锁有更多地控制。具体区别有以下几点：
 
@@ -58,7 +58,7 @@ tags: [lock,synchronized]
 
 >A better lock implementation makes fewer system calls, forces fewer context switches, and initiates less memory-synchronization traffic on the shared memory bus, operations that are time-consuming and divert computing resources from the program.
 
-###参考
+### 参考
 
 1、[java-101-the-next-generation-java-concurrency-without-the-pain-part-2](http://www.javaworld.com/article/2078848/java-concurrency/java-101-the-next-generation-java-concurrency-without-the-pain-part-2.html)
 

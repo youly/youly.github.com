@@ -5,13 +5,13 @@ category: java
 tags: [java]
 ---
 
-###什么是内存管理
+### 什么是内存管理
 
 内存管理包括内存的分配和回收。
 
 在C++语言中内存管理是由程序员显式地来完成的，这通常导致一些常见的bug，如悬空指针引用和垃圾对象导致的内存泄露。java语言自从java 2开始就提供了自动内存管理的功能：垃圾回收器。
 
-###运行时内存组成
+### 运行时内存组成
 
 大致布局如下图（[来自](http://www.pointsoftware.ch/de/under-the-hood-runtime-data-areas-javas-memory-model/)）：
 
@@ -37,7 +37,7 @@ tags: [java]
 年老代：新生代中经过几次垃圾回收仍存活的对象 + eden中存放不下的大对象。
 
 
-###垃圾回收器应该满足的特性
+### 垃圾回收器应该满足的特性
 1、正确性：有效数据保证永远不会被错误回收，垃圾数据不应该经过几轮垃圾回收后仍保留。
 
 2、高效性：在保证应用程序不中断的情况下快速的回收垃圾。时间、空间、频次上达到一个平衡。
@@ -46,12 +46,12 @@ tags: [java]
 
 4、可扩展性：垃圾回收器不应该成为一个多核多线程应用程序中得一个性能瓶颈。
 
-###分代回收
+### 分代回收
 新生代：内存小，收集频繁，要求时间利用率高
 
 老年代：内存大，频次低，要求空间利用率高
 
-###JVM启动参数设置
+### JVM启动参数设置
 
 -Xms，-Xmx：jvm初始化内存大小和最大内存大小，等于 年轻代大小 + 年老代大小 + 永久代大小 + 栈大小
 
@@ -67,7 +67,7 @@ tags: [java]
 
 XX:SurvivorRatio：Ratio of eden/survivor space size. The default value is 8.
 
-###参考
+### 参考
 1、[Memory Management in the Java HotSpot™ Virtual Machine](http://www.oracle.com/technetwork/java/javase/memorymanagement-whitepaper-150215.pdf)
 
 2、[The Structure of the Java Virtual Machine](http://docs.oracle.com/javase/specs/jvms/se7/html/jvms-2.html)

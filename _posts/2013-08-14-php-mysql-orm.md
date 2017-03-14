@@ -5,12 +5,12 @@ category: 设计
 tags: [php, mysql]
 ---
 
-###什么是ORM
+### 什么是ORM
 [ORM](http://en.wikipedia.org/wiki/Object-relational_mapping)的全称是Object Relational Mapping,以面向对象的方式来访问存储在关系型数据库里的信息。
 
-###简单实现
+### 简单实现
 
-####1、Obj-数据模型抽象
+#### 1、Obj-数据模型抽象
 
 	abstract class Obj
 	{
@@ -80,7 +80,7 @@ tags: [php, mysql]
 		}
 	}
 
-####2、DBObj-数据库操作类
+#### 2、DBObj-数据库操作类
 
 	abstract class DBObj extends Obj
 	{
@@ -129,7 +129,7 @@ tags: [php, mysql]
 		}
 	}
 
-####3、DB-数据库连接类
+#### 3、DB-数据库连接类
 	
 	class DB
 	{
@@ -159,7 +159,7 @@ tags: [php, mysql]
 		}
 	}
 
-###可以改进的地方
+### 可以改进的地方
 
 1、由于列属性频繁别访问，可以对整个属性表加以缓存。缓存的实现方式有：类静态变量、xcache缓存
 

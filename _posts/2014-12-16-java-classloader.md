@@ -5,10 +5,10 @@ category: java
 tags: [java, classloader]
 ---
 
-###什么是ClassLoader
+### 什么是ClassLoader
 简单地将，ClassLoader是类加载器，运行时动态加载类定义。给定一个类名，ClassLoader尝试获取或者生成此类的定义。最常见的是从文件系统读取编译完成的class文件来加载类。
 
-###什么时候需要ClassLoader
+### 什么时候需要ClassLoader
 1、使用new方法或者Class.forName创建类的实例
 
 2、使用类或接口的静态变量，而此类当前仍未加载
@@ -19,7 +19,7 @@ tags: [java, classloader]
 
 5、Java虚拟机启动时运行启动类main方法（Main Class）
 
-###ClassLoader遵循的原则
+### ClassLoader遵循的原则
 1、ClassLoader以层次结构组织，除了根类加载器(bootstrap class loader)，每个classloader必须要有一个“父”classloader。虽然是层级关系，但不是实际上的继承关系，这么做主要是解决安全问题，把类以命名空间隔离开来。
 
 示例图，来自[这里](http://javaeesupportpatterns.blogspot.com/2012/08/javalangnoclassdeffounderror-parent.html)：
@@ -36,7 +36,7 @@ tags: [java, classloader]
 
 6、类型转换时，如果源类和目标类对应的classloader不同，转换将失败。
 
-###类文件结构
+### 类文件结构
 ClassLoader如何加载类，还需了解下类文件结构。
 
 请参考这里：[http://docs.oracle.com/javase/specs/jvms/se7/html/jvms-4.html](http://docs.oracle.com/javase/specs/jvms/se7/html/jvms-4.html)
@@ -61,7 +61,7 @@ ClassLoader如何加载类，还需了解下类文件结构。
     }
 
 
-###JDK ClassLoader
+### JDK ClassLoader
 jdk自带三种的类加载器：
 
 1、BootStrap ClassLoader：启动类加载器，这个所有类加载的根，负责加载JDK中的核心类库，类路径为sun.boot.class.path指定
@@ -74,7 +74,7 @@ jdk自带三种的类加载器：
 
 ![classloader_hierarchy](/assets/images/classloader_hierarchy.gif)
 
-###自定义ClassLoader
+### 自定义ClassLoader
 为什么要自定义classloader呢？
 
 有的时候需要隔离包之间的访问权限，比如一个系统使用java编写，它依赖一些外部包，而不想使用此系统的应用程序类感觉到这些外部包的存在，此系统可以实现自己的classloader。
@@ -85,7 +85,7 @@ jdk自带三种的类加载器：
 
 示例代码可点击[此处](https://github.com/youly/study/blob/master/src/main/java/com/lastww/study/basis/MyClassLoader.java)
 
-###参考
+### 参考
 1、[ClassLoader](http://docs.oracle.com/javase/7/docs/api/java/lang/ClassLoader.html)
 
 2、[Understanding Network Class Loaders](http://www.oracle.com/technetwork/articles/javase/classloaders-140370.html)

@@ -5,19 +5,19 @@ category: 源码
 tags: [jetty, java, nio]
 ---
 
-###Jetty是什么
+### Jetty是什么
 
 Jetty是一个开源的项目，它主要提供了一个轻量级的Web Server和Servlet容器。
 
 Jetty中有个重要的数据结构Handler，所有可以被扩展的组件都可以作为一个handler添加到server中，由jetty来管理这些handler。本文将分析jetty组件中connector组件的源码，基于jetty-9.3.0。
 
-###什么是connnector
+### 什么是connnector
 
 Jetty由若干个组件组成，connector是其中负责处理客户端连接的组件，其在jetty整个架构中的位置如下：
 
 ![jetty-high-level-architecture](/assets/images/jetty-high-level-architecture.png)
 
-###connector类图
+### connector类图
 
 jetty包中主要的类 org.eclipse.jetty.server.Server 类中关联了 ServerConnector 类，ServerConnector类图如下：
 
@@ -25,7 +25,7 @@ jetty包中主要的类 org.eclipse.jetty.server.Server 类中关联了 ServerCo
 
 其中蓝色的线代表“类继承”，绿色实线代表“接口继承”，绿色虚线代表“接口实现”。
 
-###connector源码分析
+### connector源码分析
 
 1、成员变量ServerConnector类在Server类构造时被初始化，如下（文件org.eclipse.jetty.server.Server）：
 
@@ -321,12 +321,12 @@ _manager主要是调度selector任务。selector内部也有一个调度队列�
 
 如果selector已经处于select状态下，需要先调用selector的wakeup方法，然后才能往selector新注册channel。
 
-###总结
+### 总结
 jetty基于nio处理连接的过程总结为如下图：
 
 ![jetty nio](/assets/images/jetty_nio.png)
 
-###参考
+### 参考
 1、[Jetty Architecture](http://www.eclipse.org/jetty/documentation/current/architecture.html#basic-architecture)
 
 2、[Jetty 的工作原理以及与 Tomcat 的比较](http://www.ibm.com/developerworks/cn/java/j-lo-jetty/)

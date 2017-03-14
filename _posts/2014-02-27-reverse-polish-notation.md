@@ -158,7 +158,7 @@ tags: [php, 算法]
     $a = Formula::exp_replace('sysno-outno', array('sysno' => '2323232', 'outno' => '998979'));
     var_dump($a);
 
-###参考
+### 参考
 1、[波兰式、逆波兰式与表达式求值](http://zhouliang.pro/2013/08/18/%E9%80%86%E6%B3%A2%E5%85%B0%E5%BC%8F/)
 
 2、[逆波兰表示法](http://zh.wikipedia.org/wiki/%E9%80%86%E6%B3%A2%E5%85%B0%E8%A1%A8%E7%A4%BA%E6%B3%95)

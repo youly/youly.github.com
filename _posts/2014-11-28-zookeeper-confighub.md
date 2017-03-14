@@ -5,14 +5,14 @@ category: 设计
 tags: [zookeeper, config]
 ---
 
-###目标
+### 目标
 1、在内存中存储一套配置，业务逻辑每次从JVM本地内存中读取配置然后执行相应逻辑
 
 2、修改配置，不重启JVM，业务逻辑下次读取配置时能感知到变化
 
 3、多个JVM能共享这套配置
 
-###实现
+### 实现
 实现上述目标，可以把配置写在数据库中，每次修改配置，更新数据表相应字段即可。但若业务需频繁读取此配置，则会增加额外的性能开销。
 
 利用ZooKeeper的watcher机制能很好的实现上述目标：在zookeep中新建配置根节点，在根节点下初始化配置。虽然zookeeper支持类似文件系统的目录结构，但实现这套配置管理，只需支持根节点下面一层。每次有配置变更，重新加载所有配置，以减少内存中数据与zookeeper中数据不一致的可能。
@@ -92,7 +92,7 @@ tags: [zookeeper, config]
 
 完整代码点[这里](https://github.com/youly/study/blob/master/src/main/java/com/lastww/study/zookeeper/ZookeeperEventContainer.java)
 
-###使用zookeeper需注意的几点
+### 使用zookeeper需注意的几点
 
 1、收到zookeeper节点数据变更事件后需要重新注册watcher，否则之后不会再收到通知
 
@@ -100,7 +100,7 @@ tags: [zookeeper, config]
 
 3、节点的版本变更后，即使数据不变，也会收到通知
 
-###参考
+### 参考
 1、[ZooKeeper FAQ](http://jm-blog.aliapp.com/?p=1384)
 
 2、https://cwiki.apache.org/confluence/display/ZOOKEEPER/FAQ

@@ -7,7 +7,7 @@ tags: [queue,rabbitme,ha]
 
 [上篇文章](/2015/05/30/rabbitmq-cluster-with-high-availability-1/)提到了rabbitmq的一些概念和特性，本文承接上文，讲解如何通过docker部署rabbitmq节点。
 
-###准备环境
+### 准备环境
 
 rabbitmq集群有几点要求：
 
@@ -17,7 +17,7 @@ rabbitmq集群有几点要求：
 
 为了满足以上要求，本文使用docker来部署rabbitmq节点。
 
-####安装docker
+#### 安装docker
 
 由于 docker daemon 使用到了linux内核的一些特性，因此docker的安装对于操作系统类型和版本有一些要求。
 
@@ -25,7 +25,7 @@ rabbitmq集群有几点要求：
 
 当然 Mac OS X 是不支持的。如果一定要在mac上玩，可以下载[boot2docker](https://github.com/boot2docker/osx-installer/releases)，为运行docker定制的虚拟机。
 
-####制作docker镜像
+#### 制作docker镜像
 
 本文将在centos下安装和运行rabbitmq，docker安装完后执行以下命令下载centos镜像：
 
@@ -82,7 +82,7 @@ rabbitmq集群有几点要求：
     # 查看image
     docker images
 
-###启动rabbitmq节点
+### 启动rabbitmq节点
 
 启动主机名为rbq1的节点：
 
@@ -99,7 +99,7 @@ rabbitmq集群有几点要求：
     172.17.0.4      rbq1
     172.17.0.6      rbq2
 
-###配置rabbitmq集群
+### 配置rabbitmq集群
 
 我们以 rbq1 为主节点，将 rbq2 作为salve加入到rbq1集群:
 
@@ -123,7 +123,7 @@ rabbitmq集群有几点要求：
       {partitions,[]}]
       ...done.
 
-###配置集群ha
+### 配置集群ha
 
     [root@rbq1 /]# rabbitmqctl set_policy ha-all "^ha\." '{"ha-mode":"all"}'
     Setting policy "ha-all" for pattern "^ha\\." to "{\"ha-mode\":\"all\"}" with priority "0" ...
@@ -137,7 +137,7 @@ rabbitmq集群有几点要求：
 
 ![rabbitmq-ha](/assets/images/rabbitmq-ha.png)
 
-###参考
+### 参考
 1、[Rabbitmq Clustering Guide](https://www.rabbitmq.com/clustering.html)
 
 2、[Rabbitmq Highly Available Queues](https://www.rabbitmq.com/ha.html)
