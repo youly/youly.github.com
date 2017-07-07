@@ -2,7 +2,7 @@
 layout: post
 title: Web服务分层设计模型
 category: 方法论
-tag: [架构, 笔记]
+tag: [架构, 质量保障]
 ---
 
 ### 引言
