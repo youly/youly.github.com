@@ -25,7 +25,7 @@ Unit testing 可以基于这两点来做验证，即 state assert 和 behavior v
 #### 单元测试在整个测试流程中的位置
 一般测试流程中有如下几个阶段，并按照时间顺序进行：
 <p align="center">
-<img src="/assets/images/unit-test-2.png" alt="test" style="height: 100px;"/>
+<img src="/assets/images/unit-test-2.png" alt="test" style="height: 60px;"/>
 </p>
 * 单元测试，由开发主导，验证基础单元/模块功能。
 * 集成测试，和外部环境联通，验证跨单元的功能。
