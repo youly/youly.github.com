@@ -1,0 +1,309 @@
+
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>数据结构：B-tree</title>
+    
+    <meta name="author" content="Youly">
+
+    <!-- Enable responsive viewport -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Le HTML5 shim, for IE6-8 support of HTML elements -->
+    <!--[if lt IE 9]>
+      <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+
+    <!-- Le styles -->
+    <link href="/assets/themes/twitter/bootstrap/css/bootstrap.2.2.2.min.css" rel="stylesheet">
+    <link href="/assets/themes/twitter/css/style.css?body=1" rel="stylesheet" type="text/css" media="all">
+
+    <!-- Le fav and touch icons -->
+  <!-- Update these with your own images
+    <link rel="shortcut icon" href="images/favicon.ico">
+    <link rel="apple-touch-icon" href="images/apple-touch-icon.png">
+    <link rel="apple-touch-icon" sizes="72x72" href="images/apple-touch-icon-72x72.png">
+    <link rel="apple-touch-icon" sizes="114x114" href="images/apple-touch-icon-114x114.png">
+  -->
+
+    <!-- atom & rss feed -->
+    <link href="/atom.xml" type="application/atom+xml" rel="alternate" title="Sitewide ATOM Feed">
+    <link href="/rss.xml" type="application/rss+xml" rel="alternate" title="Sitewide RSS Feed">
+
+  </head>
+
+  <body>
+    <div class="navbar">
+      <div class="navbar-inner">
+        <div class="container-narrow">
+          <a class="brand" href="/">Youly</a>
+          <ul class="nav">
+            
+            
+            
+
+
+  
+    
+      
+      	
+      	<li><a href="/archive">存档</a></li>
+      	
+      
+    
+  
+    
+      
+    
+  
+    
+      
+      	
+      	<li><a href="/categories">分类</a></li>
+      	
+      
+    
+  
+    
+      
+    
+  
+    
+      
+      	
+      	<li><a href="/pages">页面</a></li>
+      	
+      
+    
+  
+    
+      
+    
+  
+    
+      
+    
+  
+    
+      
+      	
+      	<li><a href="/tags">标签</a></li>
+      	
+      
+    
+  
+    
+      
+    
+  
+    
+      
+    
+  
+
+
+
+
+            <!--
+            <li><a href="/resume">简历</a></li>
+            -->
+            <li><a href="/photos">相册</a></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <div class="container-narrow">
+
+      <div class="content">
+        
+
+<div class="page-header">
+  <h1>数据结构：B-tree </h1>
+</div>
+
+<div class="row-fluid post-full">
+  <div class="span12">
+    <div class="date">
+      <span>05 January 2015</span>
+    </div>
+    <div class="content">
+      <h3 id="b-tree">B-tree简介</h3>
+<p>B-tree是一种树形的数据结构，类似于<a href="http://en.wikipedia.org/wiki/Binary_search_tree">二叉搜索树</a>，但每个节点可以有多于2个的子节点。因此，二叉搜索树的性质B-tree也都有，但B-tree在磁盘数据访问上有更多地优势。我们知道，CPU访问内存的速度远比磁盘快，然而内存的容量有限，很多时候要操作的数据在内存中无法一次性全部装载，因此需要辅助存储器，然而使用辅助存储器导致的问题是寻找数据的时间远超过处理数据的时间。那么如何在辅助存储器中快速定位需要的数据？B-tree正是为这种需求而设计，它由Rudolf Bayer and Ed McCreight 于1971年发明，(B-tree中的“B”字具体指什么已经没有记载了)，可以以树的高度(磁盘seek)和内部节点key的个数(磁盘rotate)作为调整参数来缩短定位时间。</p>
+
+<h3 id="b-tree-1">B-tree定义</h3>
+<p>什么样的树是B-tree？定义一个节点[key，data]，key记录键值，不同的记录key值必须不同，data记录除key以外的数据，d为预先设定的任意一个大于1的正整数，定义为树的度(指向子节点的指针数量)，h为数的高度，那么B-tree应该满足如下的约束条件：</p>
+
+<ul>
+  <li>节点中的key按照非递减的顺序排好序。</li>
+  <li>key和指针互相间隔，节点两端是指针，每个指针要么为null，要么指向另外一个节点。</li>
+  <li>所有叶节点具有相同的深度，等于树的高度。</li>
+  <li>如果某个指针在节点node最左边且不为null，则其指向节点的所有key小于v(key1)，其中v(key1)为node的第一个key的值。</li>
+  <li>如果某个指针在节点node最右边且不为null，则其指向节点的所有key大于v(keym)，其中v(keym)为node的最后一个key的值。</li>
+  <li>如果某个指针在节点node的左右相邻key分别是keyi和keyi+1且不为null，则其指向节点的所有key小于v(keyi+1)且大于v(keyi)。</li>
+  <li>非叶子节点key的数量n-1，指针数量为n，那么n与树的度d满足约束：d&lt;=n&lt;=2d。</li>
+  <li>叶子节点最少包含一个key和两个指针，最多包含2d-1个key和2d个指针，叶节点的指针均为null 。</li>
+</ul>
+
+<p>下图为一个符合要求的B-tree，它的度为2：</p>
+
+<p><img src="/assets/images/b-tree.png" alt="b-tree" /></p>
+
+<p>树的度大小取决于磁盘块的大小。</p>
+
+<h3 id="b-tree-2">B-tree算法</h3>
+
+<h4 id="section">查找</h4>
+<p>从根节点开始，递归向下搜索：</p>
+
+<ul>
+  <li>如果是非叶子节点，若节点key中包含所查找的数值，则返回此节点，否则遍历该节点所有的key，找到 第一个 key比所查找数值大的key 前面那个key，递归查找此key的孩子节点。</li>
+  <li>如果是叶子节点，没有找到所查找数值，返回NULL。</li>
+</ul>
+
+<h4 id="section-1">插入</h4>
+<p>插入操作在叶节点进行，找到要插入的那个叶节点，进行如下操作：</p>
+
+<ul>
+  <li>如果此节点包含key的个数n与树的度数d满足n&lt;2d，则直接在此节点中插入新元素</li>
+  <li>否则，此节点包含key的个数已经“满了”，对该节点进行如下操作：
+    <ul>
+      <li>1、选取改节点的中间元素（包含新插入元素）。</li>
+      <li>2、新建两个节点，key小于中间元素的插入左节点，key大于中间元素的插入右节点。</li>
+      <li>3、中间元素插入父节点，若父节点又满了，重复步骤2。若父节点已是根节点，则创建一个新的根节点。</li>
+    </ul>
+  </li>
+</ul>
+
+<h4 id="section-2">删除</h4>
+<p>删除的节点key有两种情况，内部节点key和叶子节点key。分成两个部分，删除和调整</p>
+
+<p>删除：</p>
+
+<p>若是叶子节点key：</p>
+
+<ul>
+  <li>直接删除</li>
+  <li>若删除之后此叶子节点key数量小于d，则调整此叶子节点以满足B-tree约束。</li>
+</ul>
+
+<p>若是内部节点key：</p>
+
+<ul>
+  <li>从叶子节点中查找一个此节点的替代，通常是此节点左孩子中最有的叶子节点，或者右孩子中最左的叶子节点。</li>
+  <li>找到之后替换此内部节点key，并删除叶子节点中这个key。</li>
+  <li>从叶子节点中删除掉此替换的key之后，若子节点key数量小于d，则调整此叶子节点以满足B-tree约束。</li>
+</ul>
+
+<p>调整，假设删除key后的叶子节点为坏节点，则进行如下之一操作：</p>
+
+<ul>
+  <li>1、若坏节点有左兄弟节点且左兄弟节点key数量大于d，则把左兄弟节点最右边的key替换掉父节点key，并把父节点key插入坏节点。</li>
+  <li>2、否则若坏节点有右兄弟且右兄弟节点key数量大于d，则把右兄弟节点最左边的key替换掉父节点key，并把父节点key插入坏节点。</li>
+  <li>否则删除父节点key并把此key加入到左孩子节点，然后将右孩子节点合并至左孩子，删除右孩子节点。若删除父节点后，若父节点key数量小于d，则重复1、2、3</li>
+</ul>
+
+<h3 id="section-3">参考</h3>
+<p>1、D Comer, Ubiquitous B-tree; ACM Computing Surveys (CSUR), 1979</p>
+
+<p>2、<a href="http://en.wikipedia.org/wiki/B-tree">B-tree</a></p>
+
+<p>3、<a href="http://blog.codinglabs.org/articles/theory-of-mysql-index.html">MySQL索引背后的数据结构及算法原理</a></p>
+
+
+    </div>
+
+  
+    <ul class="tag_box inline">
+      <li><i class="icon-folder-open"></i></li>
+      
+      
+
+
+  
+     
+    	<li><a href="/categories.html#数据结构-ref">
+    		数据结构 <span>1</span>
+    	</a></li>
+    
+  
+
+
+    </ul>
+    
+
+  
+    <ul class="tag_box inline">
+      <li><i class="icon-tags"></i></li>
+      
+      
+
+
+  
+     
+    	<li><a href="/tags.html#数据结构-ref">数据结构 <span>1</span></a></li>
+     
+    	<li><a href="/tags.html#B-tree-ref">B-tree <span>1</span></a></li>
+    
+  
+
+
+
+    </ul>
+    
+
+    <hr>
+    <div class="pagination">
+      <ul>
+      
+        <li class="prev"><a href="/2014/12/18/resume" title="Resume">&larr; Previous</a></li>
+      
+        <li><a href="/archive.html">Archive</a></li>
+      
+        <li class="next"><a href="/2015/01/16/java-memory-management" title="Java内存管理">Next &rarr;</a></li>
+      
+      </ul>
+    </div>
+    <hr>
+    
+
+
+  <div id="cloud-tie-wrapper" class="cloud-tie-wrapper"></div>
+<script src="https://img1.cache.netease.com/f2e/tie/yun/sdk/loader.js"></script>
+<script>
+var cloudTieConfig = {
+      url: document.location.href, 
+        sourceId: "",
+          productKey: "0fd00f73d0a349de8d748338ffe413a0",
+            target: "cloud-tie-wrapper"
+};
+var yunManualLoad = true;
+Tie.loader("aHR0cHM6Ly9hcGkuZ2VudGllLjE2My5jb20vcGMvbGl2ZXNjcmlwdC5odG1s", true);
+</script>
+
+
+
+
+
+  </div>
+</div>
+
+
+      </div>
+      <hr>
+      <footer>
+        <p>&copy; 2017 Youly
+          with help from <a href="http://jekyllbootstrap.com" target="_blank" title="The Definitive Jekyll Blogging Framework">Jekyll Bootstrap</a>
+          and <a href="http://twitter.github.com/bootstrap/" target="_blank">Twitter Bootstrap</a>
+        </p>
+      </footer>
+
+    </div>
+
+    
+
+  </body>
+</html>
+

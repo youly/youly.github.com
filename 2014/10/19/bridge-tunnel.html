@@ -1,0 +1,252 @@
+
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>网络基础-bridge和tunnel</title>
+    
+    <meta name="author" content="Youly">
+
+    <!-- Enable responsive viewport -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Le HTML5 shim, for IE6-8 support of HTML elements -->
+    <!--[if lt IE 9]>
+      <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+
+    <!-- Le styles -->
+    <link href="/assets/themes/twitter/bootstrap/css/bootstrap.2.2.2.min.css" rel="stylesheet">
+    <link href="/assets/themes/twitter/css/style.css?body=1" rel="stylesheet" type="text/css" media="all">
+
+    <!-- Le fav and touch icons -->
+  <!-- Update these with your own images
+    <link rel="shortcut icon" href="images/favicon.ico">
+    <link rel="apple-touch-icon" href="images/apple-touch-icon.png">
+    <link rel="apple-touch-icon" sizes="72x72" href="images/apple-touch-icon-72x72.png">
+    <link rel="apple-touch-icon" sizes="114x114" href="images/apple-touch-icon-114x114.png">
+  -->
+
+    <!-- atom & rss feed -->
+    <link href="/atom.xml" type="application/atom+xml" rel="alternate" title="Sitewide ATOM Feed">
+    <link href="/rss.xml" type="application/rss+xml" rel="alternate" title="Sitewide RSS Feed">
+
+  </head>
+
+  <body>
+    <div class="navbar">
+      <div class="navbar-inner">
+        <div class="container-narrow">
+          <a class="brand" href="/">Youly</a>
+          <ul class="nav">
+            
+            
+            
+
+
+  
+    
+      
+      	
+      	<li><a href="/archive">存档</a></li>
+      	
+      
+    
+  
+    
+      
+    
+  
+    
+      
+      	
+      	<li><a href="/categories">分类</a></li>
+      	
+      
+    
+  
+    
+      
+    
+  
+    
+      
+      	
+      	<li><a href="/pages">页面</a></li>
+      	
+      
+    
+  
+    
+      
+    
+  
+    
+      
+    
+  
+    
+      
+      	
+      	<li><a href="/tags">标签</a></li>
+      	
+      
+    
+  
+    
+      
+    
+  
+    
+      
+    
+  
+
+
+
+
+            <!--
+            <li><a href="/resume">简历</a></li>
+            -->
+            <li><a href="/photos">相册</a></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <div class="container-narrow">
+
+      <div class="content">
+        
+
+<div class="page-header">
+  <h1>网络基础-bridge和tunnel </h1>
+</div>
+
+<div class="row-fluid post-full">
+  <div class="span12">
+    <div class="date">
+      <span>19 October 2014</span>
+    </div>
+    <div class="content">
+      <h3 id="bridge">什么是bridge</h3>
+
+<h4 id="section">概念</h4>
+<p>桥，字面上可以理解为连接两个不同网络段的“桥梁”，但实际上最开始是为了划分网络段，隔离冲突域。</p>
+
+<p>以太网中数据包以广播的形式发送，每台设备收到数据包后需要判断这个包是否是发给自己的，如果目标mac地址与自己的相同，则接受数据包、然后流向网络层，否则丢弃。由于所有设备共享网络传输介质，导致了如果多台设备同时发送数据包则会引发冲突。一旦设备过多，整个网络传输效率就变得低下。为了减少冲突的发生，出现了桥接器，将一个大的网络分离成两个小的网络，数据包到达桥接器时会以mac地址来判断是否要继续广播。这里桥接器内部维护一个mac地址与端口的映射表，通过多次的数据广播学习而得。</p>
+
+<p>桥接器工作于OSI模型中的链路层，交换机可以理解为有多个的端口的桥接器，连接多个不同的网段。</p>
+
+<h4 id="section-1">应用</h4>
+<p>创建一个需要上网的虚拟机，而系统只有一个网卡，这时候虚拟交换机就派上用场了。linux里自带了一个bridge内核模块，设置可参考：<a href="https://wiki.archlinux.org/index.php/Network_bridge">https://wiki.archlinux.org/index.php/Network_bridge</a></p>
+
+<h3 id="tunnel">什么是tunnel</h3>
+
+<h4 id="section-2">概念</h4>
+<p><a href="http://en.wikipedia.org/wiki/Tunneling_protocol">隧道</a>，在原有的传输层协议上对数据包的自定义协议封装。比较广泛的是ip tunnel，在ip（公网地址）协议之上传输ip（私有地址）数据包。</p>
+
+<h4 id="section-3">应用</h4>
+<p>ssh端口转发、openvpn</p>
+
+<h3 id="section-4">参考</h3>
+<p>1、<a href="http://kovyrin.net/2006/03/17/how-to-create-ip-ip-tunnel-between-freebsd-and-linux/">在freebsd和linux之间创建ip-ip tuannel</a></p>
+
+
+    </div>
+
+  
+    <ul class="tag_box inline">
+      <li><i class="icon-folder-open"></i></li>
+      
+      
+
+
+  
+     
+    	<li><a href="/categories.html#协议-ref">
+    		协议 <span>2</span>
+    	</a></li>
+    
+  
+
+
+    </ul>
+    
+
+  
+    <ul class="tag_box inline">
+      <li><i class="icon-tags"></i></li>
+      
+      
+
+
+  
+     
+    	<li><a href="/tags.html#network-ref">network <span>1</span></a></li>
+     
+    	<li><a href="/tags.html#tunnel-ref">tunnel <span>1</span></a></li>
+     
+    	<li><a href="/tags.html#bridge-ref">bridge <span>1</span></a></li>
+    
+  
+
+
+
+    </ul>
+    
+
+    <hr>
+    <div class="pagination">
+      <ul>
+      
+        <li class="prev"><a href="/2014/07/09/how-does-https-work" title="https通信原理">&larr; Previous</a></li>
+      
+        <li><a href="/archive.html">Archive</a></li>
+      
+        <li class="next"><a href="/2014/11/07/computer-codec" title="计算机编码">Next &rarr;</a></li>
+      
+      </ul>
+    </div>
+    <hr>
+    
+
+
+  <div id="cloud-tie-wrapper" class="cloud-tie-wrapper"></div>
+<script src="https://img1.cache.netease.com/f2e/tie/yun/sdk/loader.js"></script>
+<script>
+var cloudTieConfig = {
+      url: document.location.href, 
+        sourceId: "",
+          productKey: "0fd00f73d0a349de8d748338ffe413a0",
+            target: "cloud-tie-wrapper"
+};
+var yunManualLoad = true;
+Tie.loader("aHR0cHM6Ly9hcGkuZ2VudGllLjE2My5jb20vcGMvbGl2ZXNjcmlwdC5odG1s", true);
+</script>
+
+
+
+
+
+  </div>
+</div>
+
+
+      </div>
+      <hr>
+      <footer>
+        <p>&copy; 2017 Youly
+          with help from <a href="http://jekyllbootstrap.com" target="_blank" title="The Definitive Jekyll Blogging Framework">Jekyll Bootstrap</a>
+          and <a href="http://twitter.github.com/bootstrap/" target="_blank">Twitter Bootstrap</a>
+        </p>
+      </footer>
+
+    </div>
+
+    
+
+  </body>
+</html>
+

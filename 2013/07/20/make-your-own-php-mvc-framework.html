@@ -1,0 +1,651 @@
+
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>一个简单的php-mvc框架实现</title>
+    
+    <meta name="author" content="Youly">
+
+    <!-- Enable responsive viewport -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Le HTML5 shim, for IE6-8 support of HTML elements -->
+    <!--[if lt IE 9]>
+      <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+
+    <!-- Le styles -->
+    <link href="/assets/themes/twitter/bootstrap/css/bootstrap.2.2.2.min.css" rel="stylesheet">
+    <link href="/assets/themes/twitter/css/style.css?body=1" rel="stylesheet" type="text/css" media="all">
+
+    <!-- Le fav and touch icons -->
+  <!-- Update these with your own images
+    <link rel="shortcut icon" href="images/favicon.ico">
+    <link rel="apple-touch-icon" href="images/apple-touch-icon.png">
+    <link rel="apple-touch-icon" sizes="72x72" href="images/apple-touch-icon-72x72.png">
+    <link rel="apple-touch-icon" sizes="114x114" href="images/apple-touch-icon-114x114.png">
+  -->
+
+    <!-- atom & rss feed -->
+    <link href="/atom.xml" type="application/atom+xml" rel="alternate" title="Sitewide ATOM Feed">
+    <link href="/rss.xml" type="application/rss+xml" rel="alternate" title="Sitewide RSS Feed">
+
+  </head>
+
+  <body>
+    <div class="navbar">
+      <div class="navbar-inner">
+        <div class="container-narrow">
+          <a class="brand" href="/">Youly</a>
+          <ul class="nav">
+            
+            
+            
+
+
+  
+    
+      
+      	
+      	<li><a href="/archive">存档</a></li>
+      	
+      
+    
+  
+    
+      
+    
+  
+    
+      
+      	
+      	<li><a href="/categories">分类</a></li>
+      	
+      
+    
+  
+    
+      
+    
+  
+    
+      
+      	
+      	<li><a href="/pages">页面</a></li>
+      	
+      
+    
+  
+    
+      
+    
+  
+    
+      
+    
+  
+    
+      
+      	
+      	<li><a href="/tags">标签</a></li>
+      	
+      
+    
+  
+    
+      
+    
+  
+    
+      
+    
+  
+
+
+
+
+            <!--
+            <li><a href="/resume">简历</a></li>
+            -->
+            <li><a href="/photos">相册</a></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <div class="container-narrow">
+
+      <div class="content">
+        
+
+<div class="page-header">
+  <h1>一个简单的php-mvc框架实现 </h1>
+</div>
+
+<div class="row-fluid post-full">
+  <div class="span12">
+    <div class="date">
+      <span>20 July 2013</span>
+    </div>
+    <div class="content">
+      <h3 id="mvc">什么是MVC</h3>
+<hr />
+<p><a href="http://en.wikipedia.org/wiki/Model-view-controller">维基介绍</a></p>
+
+<p>MVC是软件工程中的一种架构模式，成功地使用这种模式能够将复杂的业务逻辑和视图分离开，不仅能简化编码复杂度，还能减少代码重复量，提高编程效率。</p>
+
+<ul>
+  <li>
+    <p>M-Model， 处理数据库逻辑，关系实体映射。</p>
+  </li>
+  <li>
+    <p>V-View， 处理与用户直接相关的界面逻辑。</p>
+  </li>
+  <li>
+    <p>C-Controller， 处理具体的业务逻辑。</p>
+  </li>
+</ul>
+
+<p>在实际的MVC框架中可能还会有Action，在调用controller的方法之前由它先处理权限、Cookie等问题。controller在这种设计中可以看成java的类库，封装一些业务逻辑或算法供action调用。</p>
+
+<p>###实现一个简单的框架
+***
+####目录结构与命名规范</p>
+
+<p>首先框架应该有一个良好的目录结构以及命名规范。</p>
+
+<p><img src="/assets/images/directory.png" alt="目录结构" /></p>
+
+<p>上图是参考rails的目录结构稍作了点修改，去掉了那些我觉得暂时还不需要的，每个目录的作用如下：</p>
+
+<ul>
+  <li>
+    <p>app-具体应用程序的逻辑。</p>
+  </li>
+  <li>
+    <p>config-服务器/数据库/缓存等的具体配置</p>
+  </li>
+  <li>
+    <p>db-数据库的备份</p>
+  </li>
+  <li>
+    <p>lib-框架代码</p>
+  </li>
+  <li>
+    <p>public-静态HTML页面及一些css、images、js等</p>
+  </li>
+  <li>
+    <p>script-存放一些后台执行的命令行脚本</p>
+  </li>
+  <li>
+    <p>tmp-存放一些临时性的文件和数据</p>
+  </li>
+</ul>
+
+<p>命名规范我觉得rails的Convention over configuration做的相当完美，我们也遵循这个原则：</p>
+
+<ol>
+  <li>
+    <p>所有的model类似XxxModel.php(第一个字母大写)，在数据库中相应的表名为xxxs（小写、复数）。</p>
+  </li>
+  <li>
+    <p>所有的controller类似XxxsController.php（第一个字母大写、复数）。</p>
+  </li>
+  <li>
+    <p>所有的view类似xxxs/view.php。</p>
+  </li>
+</ol>
+
+<p>例如网站用户(user)，其对应的mvc分别为UserModel,views/users/profile.php,UsersController。表名为users。</p>
+
+<p>####Web服务器配置
+如果我们使用apache的虚拟主机，配置如下：</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>&lt;VirtualHost *:80&gt;
+	ServerName youly.com
+	RewriteEngine On
+	RewriteRule ^/(.*)$ http://www.youly.com/$1 [L,R]
+&lt;/VirtualHost&gt;
+
+&lt;VirtualHost *:80&gt;
+    ServerName www.youly.com
+    ServerAlias *.youly.com
+    DocumentRoot /path/to/public
+    &lt;Directory "/path/to/public"&gt;
+    &lt;/Directory&gt;
+    RewriteEngine on
+    RewriteRule ^/(assets\/.*)$ /$1 [L] 
+    RewriteRule ^/(.*)$ /index.php [L] 
+&lt;/VirtualHost&gt;
+</code></pre>
+</div>
+
+<p>上面的重写规则指定除了public目录之外所有的请求都重定向到public目录下的index.php文件。可<a href="http://www.yourhtmlsource.com/sitemanagement/urlrewriting.html">点此</a>了解apache的重写规则。打开index.php文件，我们可以看到如下的两行代码：</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>Dispatcher::getInstance()-&gt;dispatch();
+</code></pre>
+</div>
+
+<p>这个文件很简短，只有两行。注意它并没有以?&gt;结尾，主要是为了避免在我们的输出中注入多余的空格。那么Dispatcher是什么？它来自哪里？</p>
+
+<p>####php配置
+ROOT为网站根目录。打开php.ini并设置auto_prepend_file=ROOT/config/prepend.php，这样每次执行用户请求的php文件前php内核将先执行prepend.php。打开prepend.php文件，我们可以看到：</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>define('DEVELOPMENT_ENVIRONMENT', true);
+define('DS', DIRECTORY_SEPARATOR);
+define('ROOT', '/Users/meituan-it/dev/php-mvc');
+define('APP_PATH', ROOT . DS . 'app');
+define('URI', isset($_SERVER['REQUEST_URI']) ? urldecode($_SERVER['REQUEST_URI']) : '');
+define('DB_HOST', '127.0.0.1:3306');
+define('DB_USER','root');
+define('DB_PASSWORD','123');
+define('DB_NAME','youly');
+
+set_include_path(ROOT . DS . 'lib' . PATH_SEPARATOR . get_include_path());
+
+function __autoload($class) {
+    $path = sprintf('%s/lib/%s.php', ROOT, $class);
+	if(class_exists($class) || interface_exists($class)) {
+        return true;
+    } else if(file_exists($path)) {
+        include_once($path);
+        return true;
+    } else if(substr($class, -5) == 'Model') {
+        $path = sprintf('%s/models/%s.php', APP_PATH, $class);
+	} else if(substr($class, -10) == 'Controller') {
+		$path = sprintf('%s/controllers/%s.php', APP_PATH, $class);
+	} else if (substr($class, -6) == 'Helper') {
+		$path = sprintf('%s/helpers/%s.php', APP_PATH, $class);
+    }
+    if(file_exists($path)) {
+        include_once($path);
+        return true;
+    }
+	return false;
+}
+
+function setReporting() {
+	if (DEVELOPMENT_ENVIRONMENT == true) {
+	    error_reporting(E_ALL);
+	    ini_set('display_errors','On');
+	} else {
+	    error_reporting(E_ALL);
+	    ini_set('display_errors','Off');
+	    ini_set('log_errors', 'On');
+	    ini_set('error_log', ROOT.DS.'tmp'.DS.'logs'.DS.'error.log');
+	}
+}
+
+setReporting();
+</code></pre>
+</div>
+
+<p>这里重写了php原有的__autoload函数，使得它能自动加载我们自己定义的类。setReporting函数是为了方便我们调试。</p>
+
+<h4 id="section">第一个类</h4>
+
+<p>我们的第一个类Dispatcher，负责分发从前端传来的请求。打开lib/Dispatcher.php文件：</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>class Dispatcher
+{
+    protected static $front;
+    const URI_REGEXP = '/^\/([^\d\?\/\\][^\/]*?)?(?:\/([^\d\?\/\\][^\/]*?))?(?:\/([^\?]+?))?(?:\/\?.*)?$/s';
+
+	public static function getInstance()
+	{
+		if(!isset(self::$front))
+		{
+			self::$front = new self();
+		}
+		return self::$front;
+	}
+
+	public static function dispatch()
+    {
+        if(!preg_match(self::URI_REGEXP, URI, $urlArray)) {
+            return BaseController::page404();
+        }
+        $class = isset($urlArray[1]) &amp;&amp; !empty($urlArray[1]) ? $urlArray[1] : 'index';
+        $action = isset($urlArray[2]) &amp;&amp; !empty($urlArray[2]) ? $urlArray[2] : 'default';
+        if(isset($urlArray[3])) {
+            $arr = explode('/', $urlArray[3]);
+            foreach($arr as $k =&gt; $v) {
+                $arr[$k] = trim(urldecode($v));
+            }
+            $args = $arr;
+        } else {
+            $args = array();
+        }
+        //var_dump($controllerName, $action, $urlArray, $args);
+        $method = ucwords($action);
+		if(strcasecmp($_SERVER['REQUEST_METHOD'], 'POST') === 0) {
+			$method = 'actPost' . $action;
+		} else {
+			$method = 'act' . $action;
+		}
+
+		$controller = ucwords($class) . 'Controller';
+        $model = ucwords($class) . 'Model';
+        $view = $class;
+		$controllerObj = new $controller($model, $view, $action);
+
+		if ((int)method_exists($controller, $method)) {
+			call_user_func_array(array($controllerObj, $method), $args);
+			$controllerObj-&gt;renderTemplate();
+		} else {
+			return BaseController::page404();
+		}
+	}
+}
+</code></pre>
+</div>
+
+<p>这个类的主要函数是dispatch，由它来负责分发请求。处理的url类似 <strong>youly.com/controllerName/actionName/queryString</strong>。关于这个正则表达式的分析看<a href="/2013/07/18/php-regular-expression-greedy-or-nongreedy">这篇文章</a>。根据url中的控制器和动作，框架构造一个继承自BaseController的子类来处理具体的请求。</p>
+
+<h4 id="controller">Controller</h4>
+
+<p>打来文件lib/BaseController.php:</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>class BaseController {
+     
+    protected $_model;
+    protected $_action;
+    protected $_view;
+ 
+    public function __construct($model, $view, $action) {
+         
+        $this-&gt;_action = $action;
+        $this-&gt;_model = $model;
+        $this-&gt;_view = new View($view,$action);
+    }
+ 
+    public function set($name,$value) {
+        $this-&gt;_view-&gt;set($name,$value);
+    }
+ 
+    public static function page404()
+    {
+	    echo '404 NOT FOUND!';
+	    return false;
+    }
+    
+    public function renderTemplate()
+    {
+	    $this-&gt;_view-&gt;render();
+    }
+}
+</code></pre>
+</div>
+
+<p>Controller负责从Mode里取数据，并通过视图呈现出来。</p>
+
+<h4 id="view">View</h4>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>class View {
+     
+    protected $variables = array();
+    protected $_view;
+    protected $_action;
+     
+    function __construct($view,$action) {
+        $this-&gt;_view = $view;
+        $this-&gt;_action = $action;
+    }
+    //模板变量 
+    function set($name,$value) {
+        $this-&gt;variables[$name] = $value;
+    }
+ 
+    function render() {
+        extract($this-&gt;variables);
+        if(file_exists(APP_PATH . DS . 'views' . DS . 'common' . DS . 'header.php')) {
+        	include (APP_PATH . DS . 'views' . DS . 'common' . DS . 'header.php');
+        }
+ 	    if(file_exists(APP_PATH. DS . 'views' . DS . $this-&gt;_view . DS . $this-&gt;_action . '.php')) {
+        	include (APP_PATH. DS . 'views' . DS . $this-&gt;_view . DS . $this-&gt;_action . '.php');
+ 	    } else {
+		    BaseController::page404();
+ 	    }
+        if(file_exists(APP_PATH . DS . 'views' . DS . 'common' . DS . 'footer.php')) {
+        	include (APP_PATH . DS . 'views' . DS . 'common' . DS . 'footer.php');
+        }
+    }
+}
+</code></pre>
+</div>
+
+<p>这个文件主要负责展开模板变量并包含对应的模板文件。</p>
+
+<h4 id="model">Model</h4>
+
+<p>Model，数据模型，负责存取数据。一般的Web框架中都会有对象关系映射（ORM)，即一个Model类属性对应数据库记录的一列。为了简单起见，先不考虑这个。</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>class BaseModel extends SQLQuery
+{
+    protected $_table;
+
+    function __construct() {
+
+        $this-&gt;connect(DB_HOST,DB_USER,DB_PASSWORD,DB_NAME);
+        $this-&gt;_table = strtolower(substr(get_class($this), 0, -5));
+    }
+
+    function __destruct() {
+    }
+}
+</code></pre>
+</div>
+
+<p>这个类继承自SQLQuery，它封装了数据库连接的逻辑：</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>class SQLQuery {
+    protected $_db;
+    protected $_result;
+
+    /** Connects to database **/
+
+    function connect($address, $account, $pwd, $name) {
+        $this-&gt;_db = @mysql_connect($address, $account, $pwd);
+        if ($this-&gt;_db != 0) {
+            if (mysql_select_db($name, $this-&gt;_db)) {
+                return 1;
+            }
+            else {
+                return 0;
+            }
+        }
+        else {
+            return 0;
+        }
+    }
+
+    /** Disconnects from database **/
+
+    function disconnect() {
+        if (@mysql_close($this-&gt;_db) != 0) {
+            return 1;
+        }  else {
+            return 0;
+        }
+    }
+    
+    function selectAll() {
+    	$query = 'select * from `'.$this-&gt;_table.'`';
+    	return $this-&gt;query($query);
+    }
+
+	function query($query, $singleResult = 0) {
+
+		$this-&gt;_result = mysql_query($query, $this-&gt;_db);
+		$result = array();
+		$field = array();
+		$tempResults = array();
+		$numOfFields = mysql_num_fields($this-&gt;_result);
+		for ($i = 0; $i &lt; $numOfFields; ++$i) {
+		    array_push($field,mysql_field_name($this-&gt;_result, $i));
+		}
+
+		
+        while ($row = mysql_fetch_row($this-&gt;_result)) {
+            for ($i = 0;$i &lt; $numOfFields; ++$i) {
+                $tempResults[$field[$i]] = $row[$i];
+            }
+            if ($singleResult == 1) {
+                mysql_free_result($this-&gt;_result);
+                return $tempResults;
+            }
+            array_push($result,$tempResults);
+        }
+        mysql_free_result($this-&gt;_result);
+        return($result);
+	}
+    /** 释放数据库连接 **/
+    function freeResult() {
+        mysql_free_result($this-&gt;_result);
+    }
+    /** 返回错误字符串 **/
+    function getError() {
+        return mysql_error($this-&gt;_db);
+    }
+}
+</code></pre>
+</div>
+
+<h4 id="section-1">实例</h4>
+<p>有了上面的mvc，就可以开始做简单的开发了：</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>class IndexController extends BaseController
+{
+	public function actDefault($defaultArg = null)
+    {
+        $this-&gt;set('defaultArg', $defaultArg);
+        $message = new MessageModel();
+        $msgs = $message-&gt;selectAll();
+        $this-&gt;set('messages', $msgs);
+	}
+}
+
+echo is_null($defaultArg) ? 'hello world' : 'hello ' . $defaultArg;
+
+echo '&lt;h3&gt;留言板&lt;/h3&gt;
+&lt;table border=0&gt;
+&lt;tr&gt;&lt;th&gt;内容&lt;/th&gt;&lt;th&gt;时间&lt;/th&gt;';
+foreach($messages as $msg)
+{
+	echo '&lt;tr&gt;';
+	echo '&lt;td&gt;', $msg['msg'], '&lt;/td&gt;&lt;td&gt;', date('Y-m-d H:i:s', $msg['addtime']), '&lt;/td&gt;';
+	echo '&lt;/tr&gt;';
+}
+echo '&lt;/table&gt;';
+
+class MessageModel extends BaseModel
+{
+	
+}
+</code></pre>
+</div>
+
+<p>在浏览器中访问 www.youly.com,如下</p>
+
+<p><img src="/assets/images/mvc-example.png" alt="example" /></p>
+
+<h3 id="section-2">参考</h3>
+<hr />
+<p>1、<a href="http://anantgarg.com/2009/03/13/write-your-own-php-mvc-framework-part-1/">http://anantgarg.com/2009/03/13/write-your-own-php-mvc-framework-part-1/</a></p>
+
+<p>2、<a href="http://www.yourhtmlsource.com/sitemanagement/urlrewriting.html">Apache rewrite rules</a></p>
+
+    </div>
+
+  
+    <ul class="tag_box inline">
+      <li><i class="icon-folder-open"></i></li>
+      
+      
+
+
+  
+     
+    	<li><a href="/categories.html#设计-ref">
+    		设计 <span>6</span>
+    	</a></li>
+    
+  
+
+
+    </ul>
+    
+
+  
+    <ul class="tag_box inline">
+      <li><i class="icon-tags"></i></li>
+      
+      
+
+
+  
+     
+    	<li><a href="/tags.html#php-ref">php <span>5</span></a></li>
+    
+  
+
+
+
+    </ul>
+    
+
+    <hr>
+    <div class="pagination">
+      <ul>
+      
+        <li class="prev"><a href="/2013/07/18/php-regular-expression-greedy-or-nongreedy" title="php正则表达式-非贪婪匹配和递归匹配">&larr; Previous</a></li>
+      
+        <li><a href="/archive.html">Archive</a></li>
+      
+        <li class="next"><a href="/2013/08/14/php-mysql-orm" title="基于php、mysql实现的对象关系映射">Next &rarr;</a></li>
+      
+      </ul>
+    </div>
+    <hr>
+    
+
+
+  <div id="cloud-tie-wrapper" class="cloud-tie-wrapper"></div>
+<script src="https://img1.cache.netease.com/f2e/tie/yun/sdk/loader.js"></script>
+<script>
+var cloudTieConfig = {
+      url: document.location.href, 
+        sourceId: "",
+          productKey: "0fd00f73d0a349de8d748338ffe413a0",
+            target: "cloud-tie-wrapper"
+};
+var yunManualLoad = true;
+Tie.loader("aHR0cHM6Ly9hcGkuZ2VudGllLjE2My5jb20vcGMvbGl2ZXNjcmlwdC5odG1s", true);
+</script>
+
+
+
+
+
+  </div>
+</div>
+
+
+      </div>
+      <hr>
+      <footer>
+        <p>&copy; 2017 Youly
+          with help from <a href="http://jekyllbootstrap.com" target="_blank" title="The Definitive Jekyll Blogging Framework">Jekyll Bootstrap</a>
+          and <a href="http://twitter.github.com/bootstrap/" target="_blank">Twitter Bootstrap</a>
+        </p>
+      </footer>
+
+    </div>
+
+    
+
+  </body>
+</html>
+

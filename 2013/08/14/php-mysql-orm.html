@@ -1,0 +1,394 @@
+
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>基于php、mysql实现的对象关系映射</title>
+    
+    <meta name="author" content="Youly">
+
+    <!-- Enable responsive viewport -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Le HTML5 shim, for IE6-8 support of HTML elements -->
+    <!--[if lt IE 9]>
+      <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+
+    <!-- Le styles -->
+    <link href="/assets/themes/twitter/bootstrap/css/bootstrap.2.2.2.min.css" rel="stylesheet">
+    <link href="/assets/themes/twitter/css/style.css?body=1" rel="stylesheet" type="text/css" media="all">
+
+    <!-- Le fav and touch icons -->
+  <!-- Update these with your own images
+    <link rel="shortcut icon" href="images/favicon.ico">
+    <link rel="apple-touch-icon" href="images/apple-touch-icon.png">
+    <link rel="apple-touch-icon" sizes="72x72" href="images/apple-touch-icon-72x72.png">
+    <link rel="apple-touch-icon" sizes="114x114" href="images/apple-touch-icon-114x114.png">
+  -->
+
+    <!-- atom & rss feed -->
+    <link href="/atom.xml" type="application/atom+xml" rel="alternate" title="Sitewide ATOM Feed">
+    <link href="/rss.xml" type="application/rss+xml" rel="alternate" title="Sitewide RSS Feed">
+
+  </head>
+
+  <body>
+    <div class="navbar">
+      <div class="navbar-inner">
+        <div class="container-narrow">
+          <a class="brand" href="/">Youly</a>
+          <ul class="nav">
+            
+            
+            
+
+
+  
+    
+      
+      	
+      	<li><a href="/archive">存档</a></li>
+      	
+      
+    
+  
+    
+      
+    
+  
+    
+      
+      	
+      	<li><a href="/categories">分类</a></li>
+      	
+      
+    
+  
+    
+      
+    
+  
+    
+      
+      	
+      	<li><a href="/pages">页面</a></li>
+      	
+      
+    
+  
+    
+      
+    
+  
+    
+      
+    
+  
+    
+      
+      	
+      	<li><a href="/tags">标签</a></li>
+      	
+      
+    
+  
+    
+      
+    
+  
+    
+      
+    
+  
+
+
+
+
+            <!--
+            <li><a href="/resume">简历</a></li>
+            -->
+            <li><a href="/photos">相册</a></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <div class="container-narrow">
+
+      <div class="content">
+        
+
+<div class="page-header">
+  <h1>基于php、mysql实现的对象关系映射 </h1>
+</div>
+
+<div class="row-fluid post-full">
+  <div class="span12">
+    <div class="date">
+      <span>14 August 2013</span>
+    </div>
+    <div class="content">
+      <h3 id="orm">什么是ORM</h3>
+<p><a href="http://en.wikipedia.org/wiki/Object-relational_mapping">ORM</a>的全称是Object Relational Mapping,以面向对象的方式来访问存储在关系型数据库里的信息。</p>
+
+<h3 id="section">简单实现</h3>
+
+<h4 id="obj-">1、Obj-数据模型抽象</h4>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>abstract class Obj
+{
+	//对应数据库中列属性
+	protected $propTable;
+	//对象是否加载，新建则false，从数据库中load则true
+	protected $isLoad;
+
+	public function __construct($arg = null)
+	{
+		if(is_null($arg)) {
+			$this-&gt;init();
+		} else {
+			$this-&gt;load($arg);
+		}
+	}
+
+	//魔法方法，访问不存在的属性时系统自动调用此函数
+	public function __set($name, $value)
+	{
+		if(isset($this-&gt;propTable[$name])) {
+			$this-&gt;propTable[$name] = $value;
+		} else {
+			error_log('field not found!');
+		}
+	}
+
+	public function __get($name)
+	{
+		if(isset($this-&gt;propTable[$name])) {
+			return $this-&gt;propTable[$name];
+		} else {
+			error_log('field not found!');
+		}
+	}
+
+	public function init()
+	{
+		$conn = $this-&gt;db-&gt;getConn();
+		/*
+		//获取列类型信息
+		$sql = 'selecct * from $this-&gt;tableName limit 0;';
+		$stmt = $conn-&gt;prepare($sql);
+		$stmt-&gt;execute();
+		$rs = $stmt-&gt;result_metadata(); 
+		$arr = array();
+		while($field = $rs-&gt;fetch_field())
+		{
+			$arr[$field-&gt;name] = $field-&gt;def;
+		}
+		$rs-&gt;free_result();
+		$stmt-&gt;close();
+		*/
+		//获取列默认值
+		$sql = 'desc $this-&gt;tableName;'
+		$rs = $conn-&gt;query($sql); 
+		foreach($rs as $val)
+		{
+			$key = $val['field'];
+			$def = $val['default'];
+			if(isset($arr[$key])) {
+				$arr[$key] = $def;
+			}
+		}
+		$this-&gt;propTable = $arr;
+		$this-&gt;isLoad = false;
+	}
+}
+</code></pre>
+</div>
+
+<h4 id="dbobj-">2、DBObj-数据库操作类</h4>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>abstract class DBObj extends Obj
+{
+	protected $tableName;
+
+	protected $db;
+
+	protected $connUrl;
+
+	protected $primaryKey;
+
+	public function __construct($arg)
+	{
+		$this-&gt;db = DB::getInstance($this-&gt;connUrl);
+		parent::__construct($arg);
+	}
+
+	public function load($arg)
+	{
+		//为简单起见，传入$arg默认为主键
+		$sql = "select * from $this-&gt;table where $this-&gt;primaryKey=$arg;";
+		$stmt = $conn-&gt;prepare($sql);
+		$stmt-&gt;execute();
+		if(is_null($this-&gt;propTable)) {
+			$this-&gt;init();
+		}
+		$row = array();
+		$keys = array_keys($this-&gt;propTable);
+		foreach($keys as $key)
+		{
+			$eval[] = '$row["' . $key . '"]';
+		}
+		eval('$stmt-&gt;bind_result(' . implode(',', $eval) . ');');
+		$stmt-&gt;fetch();
+		foreach($row as $key =&gt; $val)
+		{
+			$this-&gt;propTable[$key] = $val;
+		}
+		$stmt-&gt;free_result;
+		$this-&gt;isLoad = true;
+	}
+
+	public function update()
+	{
+		//将对象信息存入数据库
+	}
+}
+</code></pre>
+</div>
+
+<h4 id="db-">3、DB-数据库连接类</h4>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>class DB
+{
+	protected $connConfig;
+
+	public function __construct($connUrl)
+	{
+		$this-&gt;connConfig = $this-&gt;parseUrl($connUrl);
+	}
+
+	public function getConn()
+	{
+		$conn = mysqli_init();
+		@$conn-&gt;real_connect(
+			$this-&gt;connConfig['host'],
+			$this-&gt;connConfig['user'], 
+			$this-&gt;connConfig['password'],
+			$this-&gt;connConfig['database'],
+			$this-&gt;connConfig['port']
+		);
+		$conn-&gt;query('set names '' . $arg['charset']);
+		return $conn;
+	}
+
+	public function parseUrl()
+	{
+	}
+}
+</code></pre>
+</div>
+
+<h3 id="section-1">可以改进的地方</h3>
+
+<p>1、由于列属性频繁别访问，可以对整个属性表加以缓存。缓存的实现方式有：类静态变量、xcache缓存</p>
+
+<p>2、对于频繁调用的方法加以缓存。实现方式有：以类名、方法名、方法参数为key、函数返回值为value，缓存于memcache中。</p>
+
+<p>3、update数据入库是对字段进行过滤。</p>
+
+    </div>
+
+  
+    <ul class="tag_box inline">
+      <li><i class="icon-folder-open"></i></li>
+      
+      
+
+
+  
+     
+    	<li><a href="/categories.html#设计-ref">
+    		设计 <span>6</span>
+    	</a></li>
+    
+  
+
+
+    </ul>
+    
+
+  
+    <ul class="tag_box inline">
+      <li><i class="icon-tags"></i></li>
+      
+      
+
+
+  
+     
+    	<li><a href="/tags.html#php-ref">php <span>5</span></a></li>
+     
+    	<li><a href="/tags.html#mysql-ref">mysql <span>2</span></a></li>
+    
+  
+
+
+
+    </ul>
+    
+
+    <hr>
+    <div class="pagination">
+      <ul>
+      
+        <li class="prev"><a href="/2013/07/20/make-your-own-php-mvc-framework" title="一个简单的php-mvc框架实现">&larr; Previous</a></li>
+      
+        <li><a href="/archive.html">Archive</a></li>
+      
+        <li class="next"><a href="/2013/08/19/notes-of-high-performance-mysql" title="《High Performance Mysql》学习笔记">Next &rarr;</a></li>
+      
+      </ul>
+    </div>
+    <hr>
+    
+
+
+  <div id="cloud-tie-wrapper" class="cloud-tie-wrapper"></div>
+<script src="https://img1.cache.netease.com/f2e/tie/yun/sdk/loader.js"></script>
+<script>
+var cloudTieConfig = {
+      url: document.location.href, 
+        sourceId: "",
+          productKey: "0fd00f73d0a349de8d748338ffe413a0",
+            target: "cloud-tie-wrapper"
+};
+var yunManualLoad = true;
+Tie.loader("aHR0cHM6Ly9hcGkuZ2VudGllLjE2My5jb20vcGMvbGl2ZXNjcmlwdC5odG1s", true);
+</script>
+
+
+
+
+
+  </div>
+</div>
+
+
+      </div>
+      <hr>
+      <footer>
+        <p>&copy; 2017 Youly
+          with help from <a href="http://jekyllbootstrap.com" target="_blank" title="The Definitive Jekyll Blogging Framework">Jekyll Bootstrap</a>
+          and <a href="http://twitter.github.com/bootstrap/" target="_blank">Twitter Bootstrap</a>
+        </p>
+      </footer>
+
+    </div>
+
+    
+
+  </body>
+</html>
+
