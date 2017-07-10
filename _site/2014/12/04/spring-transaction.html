@@ -1,0 +1,312 @@
+
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>使用spring声明式事务</title>
+    
+    <meta name="author" content="Youly">
+
+    <!-- Enable responsive viewport -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Le HTML5 shim, for IE6-8 support of HTML elements -->
+    <!--[if lt IE 9]>
+      <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+
+    <!-- Le styles -->
+    <link href="/assets/themes/twitter/bootstrap/css/bootstrap.2.2.2.min.css" rel="stylesheet">
+    <link href="/assets/themes/twitter/css/style.css?body=1" rel="stylesheet" type="text/css" media="all">
+
+    <!-- Le fav and touch icons -->
+  <!-- Update these with your own images
+    <link rel="shortcut icon" href="images/favicon.ico">
+    <link rel="apple-touch-icon" href="images/apple-touch-icon.png">
+    <link rel="apple-touch-icon" sizes="72x72" href="images/apple-touch-icon-72x72.png">
+    <link rel="apple-touch-icon" sizes="114x114" href="images/apple-touch-icon-114x114.png">
+  -->
+
+    <!-- atom & rss feed -->
+    <link href="/atom.xml" type="application/atom+xml" rel="alternate" title="Sitewide ATOM Feed">
+    <link href="/rss.xml" type="application/rss+xml" rel="alternate" title="Sitewide RSS Feed">
+
+  </head>
+
+  <body>
+    <div class="navbar">
+      <div class="navbar-inner">
+        <div class="container-narrow">
+          <a class="brand" href="/">Youly</a>
+          <ul class="nav">
+            
+            
+            
+
+
+  
+    
+      
+      	
+      	<li><a href="/archive">存档</a></li>
+      	
+      
+    
+  
+    
+      
+    
+  
+    
+      
+      	
+      	<li><a href="/categories">分类</a></li>
+      	
+      
+    
+  
+    
+      
+    
+  
+    
+      
+      	
+      	<li><a href="/pages">页面</a></li>
+      	
+      
+    
+  
+    
+      
+    
+  
+    
+      
+    
+  
+    
+      
+      	
+      	<li><a href="/tags">标签</a></li>
+      	
+      
+    
+  
+    
+      
+    
+  
+    
+      
+    
+  
+
+
+
+
+            <!--
+            <li><a href="/resume">简历</a></li>
+            -->
+            <li><a href="/photos">相册</a></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <div class="container-narrow">
+
+      <div class="content">
+        
+
+<div class="page-header">
+  <h1>使用spring声明式事务 </h1>
+</div>
+
+<div class="row-fluid post-full">
+  <div class="span12">
+    <div class="date">
+      <span>04 December 2014</span>
+    </div>
+    <div class="content">
+      <h3 id="section">为什么使用事务</h3>
+<p>事务有四个特性：</p>
+
+<p>1、原子性：事务作为一个整理执行，包含在其中的数据库操作要么全部执行，要么不执行。</p>
+
+<p>2、一致性：修改数据必须满足约束，包含完整性约束、级联回滚、触发器。<a href="http://en.wikipedia.org/wiki/Consistency_(database_systems)">wiki传送</a></p>
+
+<p>3、隔离性：确定了事务并发时对其他用户和系统的可见性。一般数据库提供了四个隔离级别：串行、不可重复读、读提交、脏读。</p>
+
+<p>4、持久性：事务提交后，被操作数据被永久保存下载，而不是存在内存中。</p>
+
+<p>在交易系统中，所有数据库操作必须要保证原子性、持久性，因此使用事务。</p>
+
+<h3 id="section-1">什么是声明式事务</h3>
+<p>声明式事务是spring提供事务管理的一种方式，即通过配置来声明事务管理。spring的声明式事务通过AOP + 代理实现。spring提供的另外一种事务管理是编程式事务。</p>
+
+<h3 id="section-2">与编程式事务相比</h3>
+<p>声明式事务无需编写额外的事务初始化、提交、回滚代码，无需小心翼翼捕获各种异常进而回滚操作，优点是很明显的。但也有缺点，需懂点配置，代码中有异常要转换成运行时异常抛出让上层知道。</p>
+
+<p>注意，如果要回滚数据库操作，一定要抛出运行时异常且不要有任何try catch此异常的代码。</p>
+
+<h3 id="section-3">事务配置</h3>
+
+<p>假设你的数据源配置如下：</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>&lt;bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource" destroy-method="close"&gt;
+    &lt;property name="driverClassName" value="${jdbc.driverClassName}" /&gt;
+    &lt;property name="url" value="${jdbc.url}" /&gt;
+    &lt;property name="username" value="${jdbc.username}" /&gt;
+    &lt;property name="password" value="${jdbc.password}" /&gt;
+&lt;/bean&gt;
+</code></pre>
+</div>
+
+<p>则只需添加下面的配置就可以使用spring提供的事务管理了：</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>&lt;bean id="txManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager"&gt;
+    &lt;property name="dataSource" ref="dataSource"/&gt;
+&lt;/bean&gt;
+
+&lt;tx:advice id="txAdvice" transaction-manager="txManager"&gt;
+    &lt;tx:attributes&gt;
+        &lt;tx:method name="update*" propagation="REQUIRED" read-only="false"/&gt;
+        &lt;tx:method name="onMessage" propagation="REQUIRED" read-only="false"/&gt;
+        &lt;tx:method name="*" propagation="SUPPORTS" read-only="true"/&gt;
+    &lt;/tx:attributes&gt;
+&lt;/tx:advice&gt;
+
+&lt;aop:config&gt;
+    &lt;aop:pointcut id="txPointcut" expression="
+        execution(* com.lastww.service..*.*(..)) or
+        execution(* com.lastww.listener..*.*(..))"/&gt;
+    &lt;aop:advisor advice-ref="txAdvice" pointcut-ref="txPointcut"/&gt;
+&lt;/aop:config&gt;
+</code></pre>
+</div>
+
+<p>理解上面的配置需要懂点AOP，<a href="http://docs.spring.io/spring-framework/docs/current/spring-framework-reference/html/aop.html">点此了解</a>。</p>
+
+<p>上面的配置是说，执行com.lastww.service包及其子包或者com.lastww.listener包及其子包的任何方法时启用事务管理。以update、onMessage开头的方法需要开启事务，其他方法事务以只读的方法执行。</p>
+
+<h3 id="section-4">表达式语法</h3>
+<p>pointcut有：within、args、target等。其中用的最多的是execution， 执行表达式的模式必须符合：</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>execution(modifiers-pattern? ret-type-pattern declaring-type-pattern? name-pattern(param-pattern) throws-pattern?)
+</code></pre>
+</div>
+
+<p>modifiers-pattern：修饰符，如public、protected</p>
+
+<p>ret-type-pattern：方法返回值类型</p>
+
+<p>declaring-type-pattern：<em>这个还不知道是什么</em></p>
+
+<p>name-pattern：方法名模式</p>
+
+<p>param-pattern：参数模式，(..)代表所有参数,(*)代表一个参数,(*,String)代表第一个参数为任何值,第二个为String类型.</p>
+
+<p>throws-pattern：异常列表</p>
+
+<h3 id="section-5">参考</h3>
+<p>1、<a href="http://docs.spring.io/spring/docs/current/spring-framework-reference/html/transaction.html">Spring Transaction Management</a></p>
+
+<p>2、<a href="http://sishuok.com/forum/posts/list/281.html">AspectJ切入点语法详解</a></p>
+
+
+    </div>
+
+  
+    <ul class="tag_box inline">
+      <li><i class="icon-folder-open"></i></li>
+      
+      
+
+
+  
+     
+    	<li><a href="/categories.html#框架-ref">
+    		框架 <span>1</span>
+    	</a></li>
+    
+  
+
+
+    </ul>
+    
+
+  
+    <ul class="tag_box inline">
+      <li><i class="icon-tags"></i></li>
+      
+      
+
+
+  
+     
+    	<li><a href="/tags.html#spring-ref">spring <span>1</span></a></li>
+     
+    	<li><a href="/tags.html#transaction-ref">transaction <span>1</span></a></li>
+    
+  
+
+
+
+    </ul>
+    
+
+    <hr>
+    <div class="pagination">
+      <ul>
+      
+        <li class="prev"><a href="/2014/11/28/zookeeper-confighub" title="使用zookeeper实现动态配置管理">&larr; Previous</a></li>
+      
+        <li><a href="/archive.html">Archive</a></li>
+      
+        <li class="next"><a href="/2014/12/16/java-classloader" title="Java类加载器-ClassLoader">Next &rarr;</a></li>
+      
+      </ul>
+    </div>
+    <hr>
+    
+
+
+  <div id="cloud-tie-wrapper" class="cloud-tie-wrapper"></div>
+<script src="https://img1.cache.netease.com/f2e/tie/yun/sdk/loader.js"></script>
+<script>
+var cloudTieConfig = {
+      url: document.location.href, 
+        sourceId: "",
+          productKey: "0fd00f73d0a349de8d748338ffe413a0",
+            target: "cloud-tie-wrapper"
+};
+var yunManualLoad = true;
+Tie.loader("aHR0cHM6Ly9hcGkuZ2VudGllLjE2My5jb20vcGMvbGl2ZXNjcmlwdC5odG1s", true);
+</script>
+
+
+
+
+
+  </div>
+</div>
+
+
+      </div>
+      <hr>
+      <footer>
+        <p>&copy; 2017 Youly
+          with help from <a href="http://jekyllbootstrap.com" target="_blank" title="The Definitive Jekyll Blogging Framework">Jekyll Bootstrap</a>
+          and <a href="http://twitter.github.com/bootstrap/" target="_blank">Twitter Bootstrap</a>
+        </p>
+      </footer>
+
+    </div>
+
+    
+
+  </body>
+</html>
+

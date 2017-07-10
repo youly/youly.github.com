@@ -1,10 +1,14 @@
 # This is the default format. 
 # For more see: https://github.com/mojombo/jekyll/wiki/Permalinks
+
+gems: [jekyll-gallery-generator]
+
 #permalink: /:categories/:year/:month/:day/:title
 permalink: /:year/:month/:day/:title
 
 exclude: [".rvmrc", ".rbenv-version", "README.md", "Rakefile", "changelog.md"]
 rouge: true
+#safe: false
 safe: true
 # Themes are encouraged to use these universal variables 
 # so be sure to set them if your theme uses them.
@@ -133,3 +137,27 @@ JB :
   
 
   #theme: jekyll-theme-slate
+
+gallery:
+  dir: photos               # Path to the gallery
+  symlink: false            # false: copy images into _site. true: create symbolic links (saves disk space)
+  title: 相册               # Title for gallery index page
+  title_prefix: ""          # Title prefix for gallery pages. Gallery title = title_prefix + gallery_name
+  sort_field: "date_time"   # How to sort galleries on the index page.
+                            # Possible values are: title, date_time, best_image
+  thumbnail_size:
+    x: 400                  # max width of thumbnails (in pixels)
+    y: 400                  # max height of thumbnails (in pixels)
+  # The following options are for individual galleries.
+  galleries:
+    NhaTrang:
+      best_image: DSC_0037.JPG
+      name: "越南芽庄"
+      sort_reverse: true    # Reverse sort images in gallery.
+    test:
+      best_image: DSC_0037.JPG
+      name: "test"
+      sort_reverse: true    # Reverse sort images in gallery.
+      info:
+        desc: "Gallery Description" # Info fields can be used in custom templates.
+
