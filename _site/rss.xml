@@ -5,8 +5,8 @@
         <description>Youly - Youly</description>
         <link>http://youly.github.io</link>
         <link>http://youly.github.io</link>
-        <lastBuildDate>2017-10-19T14:38:07+08:00</lastBuildDate>
-        <pubDate>2017-10-19T14:38:07+08:00</pubDate>
+        <lastBuildDate>2017-10-19T14:46:06+08:00</lastBuildDate>
+        <pubDate>2017-10-19T14:46:06+08:00</pubDate>
         <ttl>1800</ttl>
 
 
@@ -206,7 +206,7 @@ lock_trx_id: 9406881
 
 &lt;h3 id=&quot;mysql-&quot;&gt;mysql 锁设计&lt;/h3&gt;
 
-&lt;p&gt;&lt;img src=&quot;/assets/images/lock_critical.jpg&quot; alt=&quot;lock critical&quot; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;/assets/images/lock_critical.png&quot; alt=&quot;lock critical&quot; /&gt;&lt;/p&gt;
 
 &lt;p&gt;锁是针对并发访问相同资源而设计的，如上图。innodb引擎为了控制事务间不同级别下的隔离性，提了供不同类型不同粒度的锁，同一个sql语句加锁情况会不一样。下面具体讨论下mysql存储引擎innodb的锁，建议先阅读&lt;a href=&quot;http://hedengcheng.com/?p=771&quot;&gt;【MySQL 加锁处理分析】&lt;/a&gt;这篇文章，理解什么是快照读与当前读，二阶段锁。&lt;/p&gt;
 

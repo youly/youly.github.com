@@ -121,7 +121,7 @@ tag: [mysql, lock]
 
 ### mysql 锁设计
 
-![lock critical](/assets/images/lock_critical.jpg)
+![lock critical](/assets/images/lock_critical.png)
 
 锁是针对并发访问相同资源而设计的，如上图。innodb引擎为了控制事务间不同级别下的隔离性，提了供不同类型不同粒度的锁，同一个sql语句加锁情况会不一样。下面具体讨论下mysql存储引擎innodb的锁，建议先阅读[【MySQL 加锁处理分析】](http://hedengcheng.com/?p=771)这篇文章，理解什么是快照读与当前读，二阶段锁。
 
