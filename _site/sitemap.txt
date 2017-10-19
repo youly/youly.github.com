@@ -7,9 +7,8 @@ http://youly.github.io/pages
 http://youly.github.io/rss.xml
 http://youly.github.io/sitemap.txt
 http://youly.github.io/tags
-http://youly.github.io/photos/NhaTrang/
-http://youly.github.io/photos/
 
+http://youly.github.io/2017/10/19/mysql-lock-wait-timeout
 http://youly.github.io/2017/07/07/unit-testing
 http://youly.github.io/2017/07/03/web-service-layed-design
 http://youly.github.io/2017/06/10/tech-equipment-with-product-sense
