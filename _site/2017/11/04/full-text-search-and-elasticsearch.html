@@ -1,0 +1,310 @@
+
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>全文本搜索原理与Elasticsearch实践(一)</title>
+    
+    <meta name="author" content="Youly">
+
+    <!-- Enable responsive viewport -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Le HTML5 shim, for IE6-8 support of HTML elements -->
+    <!--[if lt IE 9]>
+      <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+
+    <!-- Le styles -->
+    <link href="/assets/themes/twitter/bootstrap/css/bootstrap.2.2.2.min.css" rel="stylesheet">
+    <link href="/assets/themes/twitter/css/style.css?body=1" rel="stylesheet" type="text/css" media="all">
+
+    <!-- Le fav and touch icons -->
+  <!-- Update these with your own images
+    <link rel="shortcut icon" href="images/favicon.ico">
+    <link rel="apple-touch-icon" href="images/apple-touch-icon.png">
+    <link rel="apple-touch-icon" sizes="72x72" href="images/apple-touch-icon-72x72.png">
+    <link rel="apple-touch-icon" sizes="114x114" href="images/apple-touch-icon-114x114.png">
+  -->
+
+    <!-- atom & rss feed -->
+    <link href="/atom.xml" type="application/atom+xml" rel="alternate" title="Sitewide ATOM Feed">
+    <link href="/rss.xml" type="application/rss+xml" rel="alternate" title="Sitewide RSS Feed">
+
+  </head>
+
+  <body>
+    <div class="navbar">
+      <div class="navbar-inner">
+        <div class="container-narrow">
+          <a class="brand" href="/">Youly</a>
+          <ul class="nav">
+            
+            
+            
+
+
+  
+    
+      
+      	
+      	<li><a href="/archive">存档</a></li>
+      	
+      
+    
+  
+    
+      
+    
+  
+    
+      
+      	
+      	<li><a href="/categories">分类</a></li>
+      	
+      
+    
+  
+    
+      
+    
+  
+    
+      
+      	
+      	<li><a href="/pages">页面</a></li>
+      	
+      
+    
+  
+    
+      
+    
+  
+    
+      
+    
+  
+    
+      
+      	
+      	<li><a href="/tags">标签</a></li>
+      	
+      
+    
+  
+
+
+
+
+            <!--
+            <li><a href="/resume">简历</a></li>
+            <li><a href="/photos">相册</a></li>
+            -->
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <div class="container-narrow">
+
+      <div class="content">
+        
+
+<div class="page-header">
+  <h1>全文本搜索原理与Elasticsearch实践(一) </h1>
+</div>
+
+<div class="row-fluid post-full">
+  <div class="span12">
+    <div class="date">
+      <span>04 November 2017</span>
+    </div>
+    <div class="content">
+      <h3 id="section">前言</h3>
+<p>搜索引擎解决的问题是什么？帮助用户快速获取所需数据？如果仅仅是这样，很多情况下关系型数据库如mysql就已经满足所需了：支持大数据存储，支持基于查询条件构建索引上的高性能查询，支持索引实时更新及事务性。换个角度想，已经有了mysql这种神器，为何还需要使用Elasticsearch？</p>
+
+<h3 id="section-1">数据模型</h3>
+<p>解决问题的方式，还是得回到自己的数据模型中。通常文档数据被分为以下几类：</p>
+
+<ul>
+  <li>结构化数据，文档中的每个字段都有固定的类型和长度，mysql面向的就是此类数据。</li>
+  <li>非结构化数据，与结构化数据相反，文档可能是字符串，也可能是二进制，长度不固定，典型的如邮件内容，网页内容等。</li>
+  <li>半结构化数据，这种是指文档中部分字段是结构化的，部分是无类型无长度的。比如xml格式数据，html格式数据，json数据。</li>
+</ul>
+
+<p>从应用层来看，数据获取根据以上数据模型可以分成以下几类：</p>
+
+<ul>
+  <li>结构化数据<strong>查询</strong>，根据查询条件扫描候选数据，单纯地进行是布尔型过滤，匹配则加入到结果集，否则跳过。</li>
+  <li>非结构化数据<strong>检索</strong>，认为所有数据都符合条件，但针对每条数据，根据其匹配程度进行打分，分数越高则相关性更高，越有可能出现在搜索结果前面。</li>
+  <li>半结构化数据的<strong>查询检索</strong>，这种文档的应用其实更加灵活，针对文档的部分字段进行检索，同时针对部分字段进行过滤，过滤结果不进行打分。</li>
+</ul>
+
+<p>从检索底层来看，数据其实都是结构化的。针对在海量文本中搜索某个关键字这种需求，不可能循环扫描所有文档，然后对文档内容进行逐一匹配。传统的结构化数据方式实现不了，但有需求就要解决，而且百度、谷歌都已经解决了这种问题。那么他们是怎么解决的呢？把非结构化文档进行拆分成一个个单词，形成结构化文档。搜索基于这些单词进行，拆分后单词组形成了一个字典目录，指向包含这个词的文档，这就我们常说的索引。</p>
+
+<h3 id="full-text">全文本(full-text)搜索</h3>
+
+<p><img src="/assets/images/full_text_search.png" alt="search" /></p>
+
+<p>如上图所示（<a href="http://www.cnblogs.com/forfuture1978/archive/2009/12/14/1623594.html">图片来自此处</a>），搜索引擎的核心有三点：</p>
+
+<ul>
+  <li>索引建立及存储</li>
+  <li>索引查询</li>
+  <li>结果集排序优化</li>
+</ul>
+
+<p>下面简要提一下这三点涉及到的知识点。</p>
+
+<h4 id="section-2">索引建立及存储</h4>
+<p>索引的建立主要包括文档的预处理、根据词法语法分词、停用词过滤，索引存储等。实现索引存储最重要的数据结构是倒排表，而实现倒排表又会用到有限状态转移机，跳跃表这两个数据结构。</p>
+
+<p>倒排是相对正排列来说的，在这里正排是文档到分词的排列，而倒排则是分词到文档的排列，如下图所示：
+<img src="/assets/images/index_table.png" alt="index table" /></p>
+
+<p><img src="/assets/images/inverted_index_table.png" alt="inverted index table" /></p>
+
+<p>图片很直观，如果用代码去实现，使用数组＋链表就行了，但考虑到海量数据情况下词典对内存的占用及文档检索效率的性能要求，仅有数组和链表是不够的。这时候会有更高端数据结构来代替，比如lucene里，数组使用fst数据结构实现，链表用skiplist实现，关于这两个数据结构详情，可以自己搜索相关文档了。</p>
+
+<h4 id="section-3">索引查询</h4>
+<p>同建立索引时对文档进行词法语法分析、分词过滤等一样，待检索的语句(query)也会被分割成多个词(term)，针对每个词，查询倒排表，然后对匹配结果进行合并。一般搜索引擎支持多样的查询语法，如：</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>a and b # 查询同时包含关键字a和关键字b的文档
+a or b # 查询包含关键字a或者关键字b的文档
+a and not b # 查询包含关键字a，但不包含关键字b的文档
+</code></pre>
+</div>
+
+<h4 id="section-4">结果集排序优化</h4>
+<p>查询到匹配记录后，不能直接返回给用户，因为每个文档的匹配程度不一样，如果不加以干预，可能导致完全匹配的文档排在部分匹配的文档后面。因此对符合条件的文档，需要根据其相关性进行排序。什么是相关性呢？如何衡量一个文档的相关性呢？这里不得不提两个概念：</p>
+
+<ul>
+  <li>tf，全称term frequency，一个词在一篇文档出现的次数除以此篇文档所有词数量，一个词出现的越多，则认为越重要。</li>
+  <li>idf，全称inverted document frequency，出现一个词的文档数量除以全部文档数量，一个词。出现的越多，则认为越不重要。</li>
+</ul>
+
+<p>有了这两个数字后，就可以计算一个词的权重了，有如下公式：</p>
+
+<p><img src="/assets/images/weight.png" alt="tf-idf" /></p>
+
+<p>得到词的权重后，就可以计算文档之间的相关性了。有两种比较常见的算法：<a href="https://en.wikipedia.org/wiki/Vector_space_model">向量空间模型</a>，<a href="https://en.wikipedia.org/wiki/Okapi_BM25">Okapi_BM25</a>。具体实现参考文档即可。</p>
+
+<h5 id="elasticsearch">上面谈了全文本搜索的基本原理，接下来聊聊如何正确使用ELasticsearch，下一篇文档见。</h5>
+
+<h4 id="section-5">参考</h4>
+<p><a href="http://www.cnblogs.com/forfuture1978/archive/2009/12/14/1623594.html">1、全文检索的基本原理</a></p>
+
+<p><a href="https://www.elastic.co/guide/en/elasticsearch/guide/current/search-in-depth.html">2、Search in depth</a></p>
+
+    </div>
+
+  
+    <ul class="tag_box inline">
+      <li><i class="icon-folder-open"></i></li>
+      
+      
+
+
+  
+     
+    	<li><a href="/categories.html#数据机构-ref">
+    		数据机构 <span>1</span>
+    	</a></li>
+    
+  
+
+
+    </ul>
+    
+
+  
+    <ul class="tag_box inline">
+      <li><i class="icon-tags"></i></li>
+      
+      
+
+
+  
+     
+    	<li><a href="/tags.html#algorithm-ref">algorithm <span>1</span></a></li>
+     
+    	<li><a href="/tags.html#数据结构-ref">数据结构 <span>2</span></a></li>
+    
+  
+
+
+
+    </ul>
+    
+
+    <hr>
+    <div class="pagination">
+      <ul>
+      
+        <li class="prev"><a href="/2017/10/19/mysql-lock-wait-timeout" title="从线上lock wait timeout报错看mysql锁设计">&larr; Previous</a></li>
+      
+        <li><a href="/archive.html">Archive</a></li>
+      
+        <li class="next disabled"><a>Next &rarr;</a>
+      
+      </ul>
+    </div>
+    <hr>
+    
+
+
+  <div id="cloud-tie-wrapper" class="cloud-tie-wrapper"></div>
+<script src="https://img1.cache.netease.com/f2e/tie/yun/sdk/loader.js"></script>
+<script>
+var cloudTieConfig = {
+      url: document.location.href, 
+        sourceId: "",
+          productKey: "0fd00f73d0a349de8d748338ffe413a0",
+            target: "cloud-tie-wrapper"
+};
+var yunManualLoad = true;
+Tie.loader("aHR0cHM6Ly9hcGkuZ2VudGllLjE2My5jb20vcGMvbGl2ZXNjcmlwdC5odG1s", true);
+</script>
+
+
+
+
+
+  </div>
+</div>
+
+
+      </div>
+      <hr>
+      <footer>
+        <p>&copy; 2017 Youly
+          with help from <a href="http://jekyllbootstrap.com" target="_blank" title="The Definitive Jekyll Blogging Framework">Jekyll Bootstrap</a>
+          and <a href="http://twitter.github.com/bootstrap/" target="_blank">Twitter Bootstrap</a>
+        </p>
+      </footer>
+
+    </div>
+
+    
+
+
+  <script>
+var _hmt = _hmt || [];
+(function() {
+      var hm = document.createElement("script");
+        hm.src = "https://hm.baidu.com/hm.js?8ad091ba703da2d2c2faef990fbc91f0";
+          var s = document.getElementsByTagName("script")[0]; 
+            s.parentNode.insertBefore(hm, s);
+})();
+</script>
+
+
+
+
+
+
+  </body>
+</html>
+

@@ -8,6 +8,7 @@ http://youly.github.io/rss.xml
 http://youly.github.io/sitemap.txt
 http://youly.github.io/tags
 
+http://youly.github.io/2017/11/04/full-text-search-and-elasticsearch
 http://youly.github.io/2017/10/19/mysql-lock-wait-timeout
 http://youly.github.io/2017/07/07/unit-testing
 http://youly.github.io/2017/07/03/web-service-layed-design
