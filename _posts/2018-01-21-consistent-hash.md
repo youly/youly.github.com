@@ -26,13 +26,17 @@ Web应用中，为提高系统吞吐率，降低响应时间，通常会用到�
 
 ![consistent_hash](/assets/images/consistent_hash.png)
 
-一致性哈希增加了一个虚拟节点的概念：物理节点由多个虚拟节点节点组成，key被哈希到虚拟节点。一个物理节点的增删，对应多个虚拟节点的增删。
+如果这个范围拆分的合理，那么节点的变更，最终只会导致部分数据重新分布（保证了key分布的单调性）。那么如何拆分的更合理呢？
 
-在实际实现中，虚拟节点被分配在一个环形空间中，这个环形空间包含了所有key被hash后的值，如下图，哈希值范围为 0~2**32：
+在实际实现中，这个范围被称做key space，它包含了所有key被hash后的值，如下图，假设key space的范围为 0 ~ 2^32-1。
+
+key被哈希后，对应value存储于所在范围顺时针方向的下个节点中。
 
 ![consistent_hash](/assets/images/consistent_hash1.jpg)
 
 假设其中的cache2挂掉，只需要将cache2中key范围为cache1到cache2之间的数据移动到cache3上，cache2到cache3、cache3到cache1之间的数据是不用动的，从而保证了较少数据的迁移。同理如果增加了cache4，只需将cache1中key范围为cache1到cache4的数据移动。
 
-虚拟节点的个数决定了key分布均匀性。
+为了提高key的分布均匀性，通常key spacke中的节点不是真实的节点，而是虚拟出来的。真实节点和虚拟节点之间存在一个映射关系。
+
+
 
